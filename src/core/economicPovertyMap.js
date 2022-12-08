@@ -1,6 +1,6 @@
 import { ACTIVE_BRANCH } from '../utils/data';
 
-const MAP_FILE_PATH = `https://raw.githubusercontent.com/devinit/gha-data-visualisations/${ACTIVE_BRANCH}/src/data/world_map.geo.json`;
+const MAP_FILE_PATH = `https://raw.githubusercontent.com/devinit/economic-poverty-factsheet-viz/${ACTIVE_BRANCH}/src/data/world_map.geo.json`;
 
 function renderEconomicPovertyMap() {
   window.DICharts.handler.addChart({
