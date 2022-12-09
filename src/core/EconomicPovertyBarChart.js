@@ -1,7 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import deepMerge from 'deepmerge';
-import defaultOptions, { handleResize } from '../charts/echarts/index';
+import defaultOptions, { colorways, handleResize } from '../charts/echarts/index';
 import fetchCSVData, { ACTIVE_BRANCH } from '../utils/data';
 import { addFilterWrapper } from '../widgets/filters';
 import Select from '../components/Select';
@@ -97,6 +97,7 @@ const renderEconomicPovertyBarchart = () => {
                 povertyLine = selectedPovertyLine || defaultPovertyLine;
 
                 const option = {
+                  color: colorways.bluebell,
                   responsive: false,
                   legend: {
                     selectedMode: false,
