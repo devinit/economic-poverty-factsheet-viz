@@ -13,11 +13,20 @@ const defaultPovertyLine = 'all';
 const getYears = (data) => Array.from(new Set(data.map((item) => item.year)));
 
 const getSeriesNames = (data) => Array.from(new Set(data.map((item) => item.PIP_Region)));
+const seriesNamesmapping = [
+  { name: 'EAP', label: 'East Asia and Pacific' },
+  { name: 'ECA', label: 'Europe and Central Asia' },
+  { name: 'LAC', label: 'Latin America and Caribbean' },
+  { name: 'MNA', label: 'Middle East and North Africa' },
+  { name: 'OHI', label: 'Other high income' },
+  { name: 'SAS', label: 'South Asia' },
+  { name: 'SSA', label: 'Sub-Saharan Africa' },
+];
 
 const getSeries = (dataArray, years, filterValue) => {
   const seriesNames = getSeriesNames(dataArray);
   const series = seriesNames.map((seriesName) => ({
-    name: seriesName,
+    name: seriesNamesmapping.find((item) => item.name === seriesName).label,
     type: 'bar',
     stack: 'Region',
     emphasis: {
@@ -72,9 +81,9 @@ const renderEconomicPovertyBarchart = () => {
                 label="Select poverty line"
                 options={[
                   { value: 'all', label: 'All' },
-                  { value: '2.15', label: '2.15' },
-                  { value: '3.65', label: '3.65' },
-                  { value: '6.85', label: '6.85' },
+                  { value: '2.15', label: 'US$2.15 per day' },
+                  { value: '3.65', label: 'US$3.65 per day' },
+                  { value: '6.85', label: 'US$6.85 per day' },
                 ]}
                 classNamePrefix="poverty-line-select"
                 isClearable={false}
@@ -106,7 +115,7 @@ const renderEconomicPovertyBarchart = () => {
                   },
                   yAxis: {
                     type: 'value',
-                    name: 'Number of people living in poverty',
+                    name: 'Number of people living in poverty (billions)',
                     nameLocation: 'middle',
                     nameGap: 35,
                   },
