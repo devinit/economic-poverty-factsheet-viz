@@ -30,7 +30,7 @@ const getSeries = (dataArray, years, filterValue) => {
           .filter((item) => item.poverty_line === filterValue)
           .forEach((item) => {
             if (item.PIP_Region === seriesName && item.year === year) {
-              yearList.push(Number(item.poorpop));
+              yearList.push(Number(Number(item.poorpop).toFixed(4)));
             }
           });
       } else {
@@ -40,12 +40,11 @@ const getSeries = (dataArray, years, filterValue) => {
           }
         });
       }
+      const accumulatedYearValue = yearList.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
-      return yearList.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+      return accumulatedYearValue.toFixed(4);
     }),
   }));
-
-  window.console.log(series);
 
   return series;
 };
@@ -81,7 +80,6 @@ const renderEconomicPovertyBarchart = () => {
                 isClearable={false}
                 defaultValue={[{ value: 'all', label: 'All', isCloseable: true }]}
                 onChange={(item) => {
-                  window.console.log(item.value);
                   window.DIState.setState({ povertyLine: item.value });
                 }}
                 css={{ minWidth: '100px' }}
@@ -96,29 +94,35 @@ const renderEconomicPovertyBarchart = () => {
                 const { povertyLine: selectedPovertyLine } = window.DIState.getState;
                 povertyLine = selectedPovertyLine || defaultPovertyLine;
 
-                const option = {
-                  color: colorways.bluebell,
+                const options = {
                   responsive: false,
                   legend: {
                     selectedMode: false,
                   },
+                  tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                      type: 'none',
+                    },
+                  },
                   grid: {
-                    top: 60,
-                    bottom: 20,
+                    top: '60',
+                    bottom: '20',
+                    left: '5%',
                   },
                   xAxis: {
                     data: years,
                   },
                   yAxis: {
                     type: 'value',
-                  },
-                  axisLabel: {
-                    interval: 'auto',
-                    rotate: 30,
+                    name: 'Number of people living in poverty',
+                    nameLocation: 'middle',
+                    nameGap: 35,
                   },
                   series: getSeries(data, years, povertyLine),
                 };
-                chart.setOption(deepMerge(option, defaultOptions));
+                defaultOptions.color = colorways.bluebell;
+                chart.setOption(deepMerge(defaultOptions, options));
 
                 dichart.hideLoading();
               });
