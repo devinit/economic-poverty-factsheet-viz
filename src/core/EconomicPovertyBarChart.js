@@ -96,9 +96,6 @@ const renderEconomicPovertyBarchart = () => {
 
                 const options = {
                   responsive: false,
-                  legend: {
-                    selectedMode: false,
-                  },
                   grid: {
                     top: '60',
                     bottom: '20',
