@@ -99,12 +99,6 @@ const renderEconomicPovertyBarchart = () => {
                   legend: {
                     selectedMode: false,
                   },
-                  tooltip: {
-                    trigger: 'axis',
-                    axisPointer: {
-                      type: 'none',
-                    },
-                  },
                   grid: {
                     top: '60',
                     bottom: '20',
