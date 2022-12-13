@@ -12,21 +12,12 @@ const defaultPovertyLine = 'all';
 
 const getYears = (data) => Array.from(new Set(data.map((item) => item.year)));
 
-const getSeriesNames = (data) => Array.from(new Set(data.map((item) => item.PIP_Region)));
-const seriesNamesmapping = [
-  { name: 'EAP', label: 'East Asia and Pacific' },
-  { name: 'ECA', label: 'Europe and Central Asia' },
-  { name: 'LAC', label: 'Latin America and Caribbean' },
-  { name: 'MNA', label: 'Middle East and North Africa' },
-  { name: 'OHI', label: 'Other high income' },
-  { name: 'SAS', label: 'South Asia' },
-  { name: 'SSA', label: 'Sub-Saharan Africa' },
-];
+const getSeriesNames = (data) => Array.from(new Set(data.map((item) => item['Region name'])));
 
 const getSeries = (dataArray, years, filterValue) => {
   const seriesNames = getSeriesNames(dataArray);
   const series = seriesNames.map((seriesName) => ({
-    name: seriesNamesmapping.find((item) => item.name === seriesName).label,
+    name: seriesName,
     type: 'bar',
     stack: 'Region',
     emphasis: {
@@ -36,16 +27,16 @@ const getSeries = (dataArray, years, filterValue) => {
       const yearList = [];
       if (filterValue !== defaultPovertyLine) {
         dataArray
-          .filter((item) => item.poverty_line === filterValue)
+          .filter((item) => item['poverty line (2017 PPP)'] === filterValue)
           .forEach((item) => {
-            if (item.PIP_Region === seriesName && item.year === year) {
-              yearList.push(Number(Number(item.poorpop).toFixed(4)));
+            if (item['Region name'] === seriesName && item.year === year) {
+              yearList.push(Number(Number(item['Population in poverty (billions)']).toFixed(4)));
             }
           });
       } else {
         dataArray.forEach((item) => {
-          if (item.PIP_Region === seriesName && item.year === year) {
-            yearList.push(Number(item.poorpop));
+          if (item['Region name'] === seriesName && item.year === year) {
+            yearList.push(Number(item['Population in poverty (billions)']));
           }
         });
       }
@@ -73,7 +64,7 @@ const renderEconomicPovertyBarchart = () => {
 
           const filterWrapper = addFilterWrapper(chartNode);
 
-          // create dropdowns
+          // create dropdown
           const root = createRoot(filterWrapper);
           root.render(
             <ChartFilters selectErrorMessage={selectErrorMessage}>
