@@ -1,7 +1,7 @@
 import './state';
-import renderD3Chart from './charts/d3/exampleChart';
-import renderEChart from './core/ExampleChart';
-import renderTable from './core/ExampleTable';
+// import renderD3Chart from './charts/d3/exampleChart';
+// import renderEChart from './core/ExampleChart';
+// import renderTable from './core/ExampleTable';
 import renderEconomicPovertyMap from './core/economicPovertyMap';
 import './styles/styles.css';
 
@@ -10,7 +10,7 @@ import './styles/styles.css';
  */
 window.addEventListener('load', () => {
   renderEconomicPovertyMap();
-  renderD3Chart();
-  renderEChart();
-  renderTable('dicharts--table-example');
+  // renderD3Chart();
+  // renderEChart();
+  // renderTable('dicharts--table-example');
 });

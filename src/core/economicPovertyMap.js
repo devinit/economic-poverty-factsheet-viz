@@ -1,7 +1,13 @@
+import React from 'react';
+import { createRoot } from 'react-dom/client';
 import fetchCSVData, { ACTIVE_BRANCH } from '../utils/data';
+import { addFilterWrapper } from '../widgets/filters';
+import Selectors from './components/Selectors';
 
 const MAP_FILE_PATH = `https://raw.githubusercontent.com/devinit/economic-poverty-factsheet-viz/${ACTIVE_BRANCH}/src/data/world_map.geo.json`;
 const CSV_PATH = `https://raw.githubusercontent.com/devinit/economic-poverty-factsheet-viz/${ACTIVE_BRANCH}/src/data/map_data.csv`;
+
+const getRegions = (data) => Array.from(new Set(data.map((item) => item.PIP_Region)));
 
 // const renderMap = (
 //   dimensionVariable,
@@ -145,6 +151,31 @@ function renderEconomicPovertyMap() {
               const geojsonData = jsonData.features;
               window.console.log(geojsonData);
               fetchCSVData(CSV_PATH).then((data) => {
+                const regions = getRegions(data);
+                const dropDownData = [
+                  {
+                    label: 'Select poverty data',
+                    options: [
+                      { value: 'progresspoorpop', label: 'Change in number of people in poverty' },
+                      { value: 'progressHC', label: 'Percentage of people leaving poverty' },
+                    ],
+                    classPrefix: 'poverty-data-select',
+                    stateProperty: 'povertyData',
+                    defaultValue: { value: 'progresspoorpop', label: 'Change in number of people in poverty' },
+                  },
+                  {
+                    label: 'Select region',
+                    options: regions.map((value) => ({ value, label: value })),
+                    classPrefix: 'region-select',
+                    stateProperty: 'povertyRegion',
+                    defaultValue: { value: 'all', label: 'All' },
+                  },
+                ];
+                const filterWrapper = addFilterWrapper(chartNode);
+
+                // create dropdown
+                const root = createRoot(filterWrapper);
+                root.render(<Selectors selectors={dropDownData} />);
                 window.console.log(data);
                 //   const processedCountryNameData = matchCountryNames(data, geojsonData);
                 //   const countries = Array.from(new Set(processedCountryNameData.map((stream) => stream.Country_name)));
