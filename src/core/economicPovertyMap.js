@@ -5,6 +5,7 @@ import fetchCSVData, { ACTIVE_BRANCH } from '../utils/data';
 import { addFilterWrapper } from '../widgets/filters';
 import Selectors from './components/Selectors';
 import { dataInjectedGeoJson, highlightFeature, getRegions } from '../utils/mapUtils';
+import MapResetButton from './components/MapResetButton';
 
 const MAP_FILE_PATH = `https://raw.githubusercontent.com/devinit/economic-poverty-factsheet-viz/${ACTIVE_BRANCH}/src/data/world_map.geo.json`;
 const CSV_PATH = `https://raw.githubusercontent.com/devinit/economic-poverty-factsheet-viz/${ACTIVE_BRANCH}/src/data/map_data.csv`;
@@ -151,6 +152,9 @@ function renderEconomicPovertyMap() {
           // Legend
           const legend = window.L.control({ position: 'topright' });
 
+          // Reset button
+          const resetButton = window.L.control({ position: 'bottomleft' });
+
           window
             .fetch(MAP_FILE_PATH)
             .then((response) => response.json())
@@ -184,6 +188,22 @@ function renderEconomicPovertyMap() {
                 // create dropdown
                 const root = createRoot(filterWrapper);
                 root.render(<Selectors selectors={dropDownData} />);
+
+                // Render reset Button
+
+                const onReset = () => {
+                  map.setView([6.6, 20.9], 1);
+                };
+
+                resetButton.onAdd = function () {
+                  const div = window.L.DomUtil.create('div');
+                  const buttonRoot = createRoot(div);
+                  buttonRoot.render(<MapResetButton onReset={onReset} />);
+
+                  return div;
+                };
+
+                resetButton.addTo(map);
 
                 if (window.DIState) {
                   dichart.showLoading();
