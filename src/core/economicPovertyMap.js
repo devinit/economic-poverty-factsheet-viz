@@ -44,55 +44,32 @@ const getColor = (value, minValue, maxValue, increment) => {
 
 const getRegions = (data) => Array.from(new Set(data.map((item) => item.PIP_Region)));
 
-const renderMap = (mapInstance, geoJsonData, groupInstance, csvData, dimensionVariable) => {
+const renderMap = (mapInstance, geoJsonData, groupInstance, csvData, dimensionVariable, legendInstance) => {
   let geojsonLayer;
   window.console.log(dimensionVariable);
 
-  // const legendInstanceCopy = legendInstance;
-  // legendInstanceCopy.onAdd = function () {
-  //   const div = window.L.DomUtil.create('div', 'legend');
-  //   const piecewiselegendData = [
-  //     { score: 'Not assessed', label: 'No data' },
-  //     { score: 'Very low', label: 'Very low' },
-  //     { score: 'Low', label: 'Low' },
-  //     { score: 'Medium', label: 'Medium' },
-  //     { score: 'High', label: 'High' },
-  //     { score: 'Very high', label: 'Very high' },
-  //   ];
-  //   const legendData = [
-  //     { variable: 'Severity_score', data: piecewiselegendData },
-  //     { variable: 'Climate_vulnerability', data: piecewiselegendData },
-  //     { variable: 'COVID_vaccination_rate', max: '0', min: '100' },
-  //     { variable: 'Food_insecure_(millions)', max: '26', min: '0' },
-  //     { variable: 'People_in_need_(millions)', max: '25', min: '0' },
-  //   ];
-  //   const legendColors = ['#77adde', '#5da3d9', '#0089cc', '#0071b1', '#0c457b'];
-  //   const legendContent =
-  //     dimensionVariable !== 'Severity_score' && dimensionVariable !== 'Climate_vulnerability'
-  //       ? `${legendColors
-  //           .map(
-  //             (color) =>
-  //               `<span>
-  //         <i style="background:${color};border-radius:1px;margin-right:0;width:40px;"></i>
-  //       </span>`
-  //           )
-  //           .join('')} <p style="margin-left:1px;margin-top: 4px;">${
-  //           legendData.find((items) => items.variable === dimensionVariable).min
-  //         } - ${legendData.find((items) => items.variable === dimensionVariable).max}${
-  //           dimensionVariable === 'COVID_vaccination_rate' ? ', % of population' : ', millions of people'
-  //         }</p>`
-  //       : legendData
-  //           .find((items) => items.variable === dimensionVariable)
-  //           .data.map(
-  //             (dataItems) =>
-  //               `<span><i style="background:${getColor(dataItems.score)}"></i><label>${dataItems.label}</label></span>`
-  //           )
-  //           .join('');
-  //   div.innerHTML = legendContent;
+  const legendInstanceCopy = legendInstance;
+  legendInstanceCopy.onAdd = function () {
+    const div = window.L.DomUtil.create('div', 'legend');
+    const legendColors = ['#0c457b', '#0071b1', '#0089cc', '#5da3d9', '#77adde', '#88bae5', '#bcd4f0', '#d3e0f4'];
+    const legendContent = `${legendColors
+      .map(
+        (color) =>
+          `<span>
+          <i style="background:${color};border-radius:1px;margin-right:0;width:40px;"></i>
+        </span>`
+      )
+      .join('')} <p style="margin-left:1px;margin-top: 4px;">${
+      variableData.find((item) => item.variable === dimensionVariable).minValue
+    } - ${variableData.find((item) => item.variable === dimensionVariable).maxValue}${
+      dimensionVariable === 'progressHC' ? ', % of population' : ', millions of people'
+    }</p>`;
+    div.innerHTML = legendContent;
 
-  //   return div;
-  // };
-  // legendInstanceCopy.addTo(mapInstance);
+    return div;
+  };
+  legendInstanceCopy.addTo(mapInstance);
+
   const dimensionData = variableData.find((item) => item.variable === dimensionVariable);
   const style = (feature) => ({
     fillColor:
@@ -173,8 +150,8 @@ function renderEconomicPovertyMap() {
             attributionControl: false,
           });
 
-          // // Legend
-          // const legend = window.L.control({ position: 'topright' });
+          // Legend
+          const legend = window.L.control({ position: 'topright' });
 
           window
             .fetch(MAP_FILE_PATH)
@@ -223,7 +200,7 @@ function renderEconomicPovertyMap() {
 
                     povertyRegion = selectedPovertyRegion || defaultRegion;
                     povertyData = selectedPovertyData || defaultPovertyData;
-                    renderMap(map, dataInjectedGeoJson(geojsonData, data), fg, data, povertyData);
+                    renderMap(map, dataInjectedGeoJson(geojsonData, data), fg, data, povertyData, legend);
                   });
                 }
                 dichart.hideLoading();
