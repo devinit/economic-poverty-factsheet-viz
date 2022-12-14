@@ -22,7 +22,7 @@ const variableData = [
   },
   {
     variable: 'progressHC',
-    minValue: -10,
+    minValue: -70,
     maxValue: 100,
     scale: 5,
     label: 'Percentage of people leaving poverty',
@@ -173,7 +173,7 @@ function renderEconomicPovertyMap() {
                   },
                   {
                     label: 'Select region',
-                    options: regions.map((value) => ({ value, label: value })),
+                    options: [{ value: 'all', label: 'All' }].concat(regions.map((value) => ({ value, label: value }))),
                     classPrefix: 'region-select',
                     stateProperty: 'povertyRegion',
                     defaultValue: { value: 'all', label: 'All' },
@@ -198,7 +198,14 @@ function renderEconomicPovertyMap() {
 
                     povertyRegion = selectedPovertyRegion || defaultRegion;
                     povertyData = selectedPovertyData || defaultPovertyData;
-                    renderMap(map, dataInjectedGeoJson(geojsonData, data), fg, data, povertyData, legend);
+                    renderMap(
+                      map,
+                      dataInjectedGeoJson(geojsonData, data, povertyRegion),
+                      fg,
+                      data,
+                      povertyData,
+                      legend
+                    );
                   });
                 }
                 dichart.hideLoading();

@@ -4,7 +4,7 @@
     background: white;
 }
 .dicharts--economic-poverty-leaflet {
-  /* z-index: 1; */
+  z-index: 0;
 }
 
 .spotlight-banner.data-selector--wrapper {

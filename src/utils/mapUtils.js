@@ -17,7 +17,7 @@ const highlightFeature = (e, variable, filterOptions) => {
         filterOptions.find((option) => option.variable === variable).label
       }: ${
         variable === 'progresspoorpop'
-          ? (Number(layer.feature.properties[variable]) / 1000000).toFixed(5)
+          ? (Number(layer.feature.properties[variable]) / 1000000).toFixed(4)
           : (Number(layer.feature.properties[variable]) * 100).toFixed(3)
       }<span style="padding-left: 2px;">${
         filterOptions.find((option) => option.variable === variable).unit
@@ -27,15 +27,29 @@ const highlightFeature = (e, variable, filterOptions) => {
     .openTooltip();
 };
 
-const dataInjectedGeoJson = (jsonData, csvData) =>
+const dataInjectedGeoJson = (jsonData, csvData, region) =>
   jsonData.map((feature) => {
     const featureCopy = { ...feature };
-    const matchingCountryData = csvData.find((countryData) => countryData.country_name === feature.properties.WB_NAME);
-    if (matchingCountryData) {
-      featureCopy.properties = {
-        ...feature.properties,
-        ...matchingCountryData,
-      };
+    if (region === 'all') {
+      const matchingCountryData = csvData.find(
+        (countryData) => countryData.country_name === feature.properties.WB_NAME
+      );
+      if (matchingCountryData) {
+        featureCopy.properties = {
+          ...feature.properties,
+          ...matchingCountryData,
+        };
+      }
+    } else {
+      const matchingCountryData = csvData.find(
+        (countryData) => countryData.country_name === feature.properties.WB_NAME && countryData.PIP_Region === region
+      );
+      if (matchingCountryData) {
+        featureCopy.properties = {
+          ...feature.properties,
+          ...matchingCountryData,
+        };
+      }
     }
 
     return featureCopy;
