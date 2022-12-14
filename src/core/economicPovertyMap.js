@@ -4,29 +4,30 @@ import { createRoot } from 'react-dom/client';
 import fetchCSVData, { ACTIVE_BRANCH } from '../utils/data';
 import { addFilterWrapper } from '../widgets/filters';
 import Selectors from './components/Selectors';
+import { dataInjectedGeoJson, highlightFeature, getRegions } from '../utils/mapUtils';
 
 const MAP_FILE_PATH = `https://raw.githubusercontent.com/devinit/economic-poverty-factsheet-viz/${ACTIVE_BRANCH}/src/data/world_map.geo.json`;
 const CSV_PATH = `https://raw.githubusercontent.com/devinit/economic-poverty-factsheet-viz/${ACTIVE_BRANCH}/src/data/map_data.csv`;
 const defaultPovertyData = 'progresspoorpop';
 const defaultRegion = 'all';
 
-const dataInjectedGeoJson = (jsonData, csvData) =>
-  jsonData.map((feature) => {
-    const featureCopy = { ...feature };
-    const matchingCountryData = csvData.find((countryData) => countryData.country_name === feature.properties.WB_NAME);
-    if (matchingCountryData) {
-      featureCopy.properties = {
-        ...feature.properties,
-        ...matchingCountryData,
-      };
-    }
-
-    return featureCopy;
-  });
-
 const variableData = [
-  { variable: 'progresspoorpop', minValue: -50, maxValue: 900, scale: 10 },
-  { variable: 'progressHC', minValue: -10, maxValue: 100, scale: 5 },
+  {
+    variable: 'progresspoorpop',
+    minValue: -50,
+    maxValue: 900,
+    scale: 10,
+    label: 'Change in number of people in poverty',
+    unit: 'million',
+  },
+  {
+    variable: 'progressHC',
+    minValue: -10,
+    maxValue: 100,
+    scale: 5,
+    label: 'Percentage of people leaving poverty',
+    unit: '%',
+  },
 ];
 
 const getColor = (value, minValue, maxValue, increment) => {
@@ -42,11 +43,8 @@ const getColor = (value, minValue, maxValue, increment) => {
   return colorGen(value);
 };
 
-const getRegions = (data) => Array.from(new Set(data.map((item) => item.PIP_Region)));
-
 const renderMap = (mapInstance, geoJsonData, groupInstance, csvData, dimensionVariable, legendInstance) => {
   let geojsonLayer;
-  window.console.log(dimensionVariable);
 
   const legendInstanceCopy = legendInstance;
   legendInstanceCopy.onAdd = function () {
@@ -92,41 +90,41 @@ const renderMap = (mapInstance, geoJsonData, groupInstance, csvData, dimensionVa
     fillOpacity: 1,
   });
 
-  // const resetHighlight = (e) => {
-  //   geojsonLayer.resetStyle(e.target);
-  //   e.target.closePopup();
-  // };
+  const resetHighlight = (e) => {
+    geojsonLayer.resetStyle(e.target);
+    e.target.closePopup();
+  };
 
-  // const onEachFeature = (feature, layer) => {
-  //   if (feature.properties[dimensionVariable] || feature.properties[dimensionVariable] === '') {
-  //     layer.on({
-  //       mouseover: (e) => highlightFeature(e, dimensionVariable, filterOptions, csvData),
-  //       mouseout: resetHighlight,
-  //     });
-  //   } else {
-  //     layer.on({
-  //       mouseover: () => {
-  //         const els = mapInstance.getContainer().querySelectorAll('.leaflet-interactive');
-  //         els.forEach((el) => {
-  //           const elementCopy = el;
-  //           elementCopy.classList += ' grab-cursor-enabled';
-  //         });
-  //       },
-  //       mouseout: () => {
-  //         const els = mapInstance.getContainer().querySelectorAll('.leaflet-interactive.grab-cursor-enabled');
-  //         els.forEach((el) => {
-  //           el.classList.remove('grab-cursor-enabled');
-  //         });
-  //       },
-  //     });
-  //   }
-  // };
+  const onEachFeature = (feature, layer) => {
+    if (feature.properties[dimensionVariable] || feature.properties[dimensionVariable] === '') {
+      layer.on({
+        mouseover: (e) => highlightFeature(e, dimensionVariable, variableData),
+        mouseout: resetHighlight,
+      });
+    } else {
+      layer.on({
+        mouseover: () => {
+          const els = mapInstance.getContainer().querySelectorAll('.leaflet-interactive');
+          els.forEach((el) => {
+            const elementCopy = el;
+            elementCopy.classList += ' grab-cursor-enabled';
+          });
+        },
+        mouseout: () => {
+          const els = mapInstance.getContainer().querySelectorAll('.leaflet-interactive.grab-cursor-enabled');
+          els.forEach((el) => {
+            el.classList.remove('grab-cursor-enabled');
+          });
+        },
+      });
+    }
+  };
 
   function loadLayer() {
     groupInstance.clearLayers();
     geojsonLayer = window.L.geoJSON(geoJsonData, {
       style,
-      // onEachFeature,
+      onEachFeature,
     });
     groupInstance.addLayer(geojsonLayer);
   }

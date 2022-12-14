@@ -155,3 +155,21 @@
   font-size: 13px;
   padding: 2px;
 }
+
+.leaflet-tooltip {
+  position: absolute;
+  padding: 8px;
+  background-color: #fff;
+  border: 1px solid #fff;
+  color: rgb(102, 102, 102) !important;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  pointer-events: none;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  text-align: center;
+  font: 14px/21px "Geomanist Regular", sans-serif;
+  border-radius: 10px;
+}
