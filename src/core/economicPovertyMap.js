@@ -1,4 +1,5 @@
 import React from 'react';
+import chroma from 'chroma-js';
 import { createRoot } from 'react-dom/client';
 import fetchCSVData, { ACTIVE_BRANCH } from '../utils/data';
 import { addFilterWrapper } from '../widgets/filters';
@@ -6,122 +7,154 @@ import Selectors from './components/Selectors';
 
 const MAP_FILE_PATH = `https://raw.githubusercontent.com/devinit/economic-poverty-factsheet-viz/${ACTIVE_BRANCH}/src/data/world_map.geo.json`;
 const CSV_PATH = `https://raw.githubusercontent.com/devinit/economic-poverty-factsheet-viz/${ACTIVE_BRANCH}/src/data/map_data.csv`;
+const defaultPovertyData = 'progresspoorpop';
+const defaultRegion = 'all';
+
+const dataInjectedGeoJson = (jsonData, csvData) =>
+  jsonData.map((feature) => {
+    const featureCopy = { ...feature };
+    const matchingCountryData = csvData.find((countryData) => countryData.country_name === feature.properties.WB_NAME);
+    if (matchingCountryData) {
+      featureCopy.properties = {
+        ...feature.properties,
+        ...matchingCountryData,
+      };
+    }
+
+    return featureCopy;
+  });
+
+const variableData = [
+  { variable: 'progresspoorpop', minValue: -50, maxValue: 900, scale: 10 },
+  { variable: 'progressHC', minValue: -10, maxValue: 100, scale: 5 },
+];
+
+const getColor = (value, minValue, maxValue, increment) => {
+  // Generate a range of values between the minimum and maximum value
+  const values = [];
+  for (let i = minValue; i <= maxValue; i += increment) {
+    values.push(i);
+  }
+
+  const colors = ['#0c457b', '#0071b1', '#0089cc', '#5da3d9', '#77adde', '#88bae5', '#bcd4f0', '#d3e0f4'];
+  const colorGen = chroma.scale(colors).domain(values);
+
+  return colorGen(value);
+};
 
 const getRegions = (data) => Array.from(new Set(data.map((item) => item.PIP_Region)));
 
-// const renderMap = (
-//   dimensionVariable,
-//   mapInstance,
-//   colorFunction,
-//   data,
-//   processed,
-//   filterOptions,
-//   legendInstance,
-//   groupInstance,
-//   csvData
-// ) => {
-//   let geojsonLayer;
+const renderMap = (mapInstance, geoJsonData, groupInstance, csvData, dimensionVariable) => {
+  let geojsonLayer;
+  window.console.log(dimensionVariable);
 
-//   const legendInstanceCopy = legendInstance;
-//   legendInstanceCopy.onAdd = function () {
-//     const div = window.L.DomUtil.create('div', 'legend');
-//     const piecewiselegendData = [
-//       { score: 'Not assessed', label: 'No data' },
-//       { score: 'Very low', label: 'Very low' },
-//       { score: 'Low', label: 'Low' },
-//       { score: 'Medium', label: 'Medium' },
-//       { score: 'High', label: 'High' },
-//       { score: 'Very high', label: 'Very high' },
-//     ];
-//     const legendData = [
-//       { variable: 'Severity_score', data: piecewiselegendData },
-//       { variable: 'Climate_vulnerability', data: piecewiselegendData },
-//       { variable: 'COVID_vaccination_rate', max: '0', min: '100' },
-//       { variable: 'Food_insecure_(millions)', max: '26', min: '0' },
-//       { variable: 'People_in_need_(millions)', max: '25', min: '0' },
-//     ];
-//     const legendColors = ['#77adde', '#5da3d9', '#0089cc', '#0071b1', '#0c457b'];
-//     const legendContent =
-//       dimensionVariable !== 'Severity_score' && dimensionVariable !== 'Climate_vulnerability'
-//         ? `${legendColors
-//             .map(
-//               (color) =>
-//                 `<span>
-//           <i style="background:${color};border-radius:1px;margin-right:0;width:40px;"></i>
-//         </span>`
-//             )
-//             .join('')} <p style="margin-left:1px;margin-top: 4px;">${
-//             legendData.find((items) => items.variable === dimensionVariable).min
-//           } - ${legendData.find((items) => items.variable === dimensionVariable).max}${
-//             dimensionVariable === 'COVID_vaccination_rate' ? ', % of population' : ', millions of people'
-//           }</p>`
-//         : legendData
-//             .find((items) => items.variable === dimensionVariable)
-//             .data.map(
-//               (dataItems) =>
-//                 `<span><i style="background:${getColor(dataItems.score)}"></i><label>${dataItems.label}</label></span>`
-//             )
-//             .join('');
-//     div.innerHTML = legendContent;
+  // const legendInstanceCopy = legendInstance;
+  // legendInstanceCopy.onAdd = function () {
+  //   const div = window.L.DomUtil.create('div', 'legend');
+  //   const piecewiselegendData = [
+  //     { score: 'Not assessed', label: 'No data' },
+  //     { score: 'Very low', label: 'Very low' },
+  //     { score: 'Low', label: 'Low' },
+  //     { score: 'Medium', label: 'Medium' },
+  //     { score: 'High', label: 'High' },
+  //     { score: 'Very high', label: 'Very high' },
+  //   ];
+  //   const legendData = [
+  //     { variable: 'Severity_score', data: piecewiselegendData },
+  //     { variable: 'Climate_vulnerability', data: piecewiselegendData },
+  //     { variable: 'COVID_vaccination_rate', max: '0', min: '100' },
+  //     { variable: 'Food_insecure_(millions)', max: '26', min: '0' },
+  //     { variable: 'People_in_need_(millions)', max: '25', min: '0' },
+  //   ];
+  //   const legendColors = ['#77adde', '#5da3d9', '#0089cc', '#0071b1', '#0c457b'];
+  //   const legendContent =
+  //     dimensionVariable !== 'Severity_score' && dimensionVariable !== 'Climate_vulnerability'
+  //       ? `${legendColors
+  //           .map(
+  //             (color) =>
+  //               `<span>
+  //         <i style="background:${color};border-radius:1px;margin-right:0;width:40px;"></i>
+  //       </span>`
+  //           )
+  //           .join('')} <p style="margin-left:1px;margin-top: 4px;">${
+  //           legendData.find((items) => items.variable === dimensionVariable).min
+  //         } - ${legendData.find((items) => items.variable === dimensionVariable).max}${
+  //           dimensionVariable === 'COVID_vaccination_rate' ? ', % of population' : ', millions of people'
+  //         }</p>`
+  //       : legendData
+  //           .find((items) => items.variable === dimensionVariable)
+  //           .data.map(
+  //             (dataItems) =>
+  //               `<span><i style="background:${getColor(dataItems.score)}"></i><label>${dataItems.label}</label></span>`
+  //           )
+  //           .join('');
+  //   div.innerHTML = legendContent;
 
-//     return div;
-//   };
-//   legendInstanceCopy.addTo(mapInstance);
-//   const style = (feature) => ({
-//     fillColor:
-//       filterOptions.find((opts) => opts.name === dimensionVariable).scaleType === 'piecewise'
-//         ? colorFunction(feature.properties[dimensionVariable])
-//         : colorFunction(
-//             feature.properties[dimensionVariable],
-//             filterOptions.find((opts) => opts.name === dimensionVariable).values,
-//             dimensionVariable
-//           ),
-//     weight: 1,
-//     opacity: 1,
-//     color: 'white',
-//     fillOpacity: 1,
-//   });
+  //   return div;
+  // };
+  // legendInstanceCopy.addTo(mapInstance);
+  const dimensionData = variableData.find((item) => item.variable === dimensionVariable);
+  const style = (feature) => ({
+    fillColor:
+      dimensionVariable === 'progresspoorpop'
+        ? getColor(
+            Number(feature.properties[dimensionVariable]) / 1000000,
+            dimensionData.minValue,
+            dimensionData.maxValue,
+            dimensionData.scale
+          )
+        : getColor(
+            Number(feature.properties[dimensionVariable]) * 100,
+            dimensionData.minValue,
+            dimensionData.maxValue,
+            dimensionData.scale
+          ),
+    weight: 1,
+    opacity: 1,
+    color: 'white',
+    fillOpacity: 1,
+  });
 
-//   const resetHighlight = (e) => {
-//     geojsonLayer.resetStyle(e.target);
-//     e.target.closePopup();
-//   };
+  // const resetHighlight = (e) => {
+  //   geojsonLayer.resetStyle(e.target);
+  //   e.target.closePopup();
+  // };
 
-//   const onEachFeature = (feature, layer) => {
-//     if (feature.properties[dimensionVariable] || feature.properties[dimensionVariable] === '') {
-//       layer.on({
-//         mouseover: (e) => highlightFeature(e, dimensionVariable, filterOptions, csvData),
-//         mouseout: resetHighlight,
-//       });
-//     } else {
-//       layer.on({
-//         mouseover: () => {
-//           const els = mapInstance.getContainer().querySelectorAll('.leaflet-interactive');
-//           els.forEach((el) => {
-//             const elementCopy = el;
-//             elementCopy.classList += ' grab-cursor-enabled';
-//           });
-//         },
-//         mouseout: () => {
-//           const els = mapInstance.getContainer().querySelectorAll('.leaflet-interactive.grab-cursor-enabled');
-//           els.forEach((el) => {
-//             el.classList.remove('grab-cursor-enabled');
-//           });
-//         },
-//       });
-//     }
-//   };
+  // const onEachFeature = (feature, layer) => {
+  //   if (feature.properties[dimensionVariable] || feature.properties[dimensionVariable] === '') {
+  //     layer.on({
+  //       mouseover: (e) => highlightFeature(e, dimensionVariable, filterOptions, csvData),
+  //       mouseout: resetHighlight,
+  //     });
+  //   } else {
+  //     layer.on({
+  //       mouseover: () => {
+  //         const els = mapInstance.getContainer().querySelectorAll('.leaflet-interactive');
+  //         els.forEach((el) => {
+  //           const elementCopy = el;
+  //           elementCopy.classList += ' grab-cursor-enabled';
+  //         });
+  //       },
+  //       mouseout: () => {
+  //         const els = mapInstance.getContainer().querySelectorAll('.leaflet-interactive.grab-cursor-enabled');
+  //         els.forEach((el) => {
+  //           el.classList.remove('grab-cursor-enabled');
+  //         });
+  //       },
+  //     });
+  //   }
+  // };
 
-//   function loadLayer() {
-//     groupInstance.clearLayers();
-//     geojsonLayer = window.L.geoJSON(dataInjectedGeoJson(data, processed), {
-//       style,
-//       onEachFeature,
-//     });
-//     groupInstance.addLayer(geojsonLayer);
-//   }
-//   loadLayer();
-// };
+  function loadLayer() {
+    groupInstance.clearLayers();
+    geojsonLayer = window.L.geoJSON(geoJsonData, {
+      style,
+      // onEachFeature,
+    });
+    groupInstance.addLayer(geojsonLayer);
+  }
+  loadLayer();
+};
 
 function renderEconomicPovertyMap() {
   window.DICharts.handler.addChart({
@@ -131,26 +164,26 @@ function renderEconomicPovertyMap() {
         Array.prototype.forEach.call(chartNodes, (chartNode) => {
           window.dataLayer = window.dataLayer || [];
           const dichart = new window.DICharts.Chart(chartNode.parentElement);
-          // const map = window.L.map(chartNode, {
-          //   maxZoom: 3,
-          //   minZoom: 1,
-          //   crs: window.L.CRS.EPSG4326,
-          //   center: [6.6, 20.9],
-          //   zoom: 1,
-          //   attributionControl: false,
-          // });
+          const map = window.L.map(chartNode, {
+            maxZoom: 3,
+            minZoom: 1,
+            crs: window.L.CRS.EPSG4326,
+            center: [6.6, 20.9],
+            zoom: 1,
+            attributionControl: false,
+          });
 
           // // Legend
           // const legend = window.L.control({ position: 'topright' });
 
-          dichart.showLoading();
           window
             .fetch(MAP_FILE_PATH)
             .then((response) => response.json())
             .then((jsonData) => {
+              const fg = window.L.featureGroup().addTo(map);
               const geojsonData = jsonData.features;
-              window.console.log(geojsonData);
               fetchCSVData(CSV_PATH).then((data) => {
+                // const countries = Array.from(new Set(data.map((stream) => stream.country_name)));
                 const regions = getRegions(data);
                 const dropDownData = [
                   {
@@ -176,23 +209,23 @@ function renderEconomicPovertyMap() {
                 // create dropdown
                 const root = createRoot(filterWrapper);
                 root.render(<Selectors selectors={dropDownData} />);
-                window.console.log(data);
-                //   const processedCountryNameData = matchCountryNames(data, geojsonData);
-                //   const countries = Array.from(new Set(processedCountryNameData.map((stream) => stream.Country_name)));
 
-                // renderMap(
-                //   variable,
-                //   map,
-                //   filterOptions.find((option) => option.name === variable).scaleType === 'continous'
-                //     ? getColorContinous
-                //     : getColor,
-                //   geojsonData,
-                //   groupedData,
-                //   filterOptions,
-                //   legend,
-                //   fg,
-                //   data
-                // );
+                if (window.DIState) {
+                  dichart.showLoading();
+                  let povertyRegion = defaultRegion;
+                  let povertyData = defaultPovertyData;
+                  window.DIState.addListener(() => {
+                    const { povertyRegion: selectedPovertyRegion, povertyData: selectedPovertyData } =
+                      window.DIState.getState;
+
+                    // only update if povertyData or povertyRegion have changed
+                    if (povertyRegion === selectedPovertyRegion && povertyData === selectedPovertyData) return;
+
+                    povertyRegion = selectedPovertyRegion || defaultRegion;
+                    povertyData = selectedPovertyData || defaultPovertyData;
+                    renderMap(map, dataInjectedGeoJson(geojsonData, data), fg, data, povertyData);
+                  });
+                }
                 dichart.hideLoading();
               });
             })
