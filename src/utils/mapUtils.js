@@ -64,4 +64,15 @@ const getRegions = (data) => Array.from(new Set(data.map((item) => item.PIP_Regi
 
 const getLineFilteredData = (data, line) => data.filter((item) => item.poverty_line === line);
 
-export { highlightFeature, dataInjectedGeoJson, getRegions, getLineFilteredData };
+const getFillColor = (feature, data, variable, colorFunction) => {
+  if (!feature.properties[variable]) {
+    return '#E6E1E5';
+  }
+  if (variable === 'progresspoorpop') {
+    return colorFunction(Number(feature.properties[variable]) / 1000000, data.minValue, data.maxValue, data.scale);
+  }
+
+  return colorFunction(Number(feature.properties[variable]) * 100, data.minValue, data.maxValue, data.scale);
+};
+
+export { highlightFeature, dataInjectedGeoJson, getRegions, getLineFilteredData, getFillColor };

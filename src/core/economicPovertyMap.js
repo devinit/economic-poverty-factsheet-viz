@@ -4,7 +4,13 @@ import { createRoot } from 'react-dom/client';
 import fetchCSVData, { ACTIVE_BRANCH } from '../utils/data';
 import { addFilterWrapper } from '../widgets/filters';
 import Selectors from './components/Selectors';
-import { dataInjectedGeoJson, highlightFeature, getRegions, getLineFilteredData } from '../utils/mapUtils';
+import {
+  dataInjectedGeoJson,
+  highlightFeature,
+  getRegions,
+  getLineFilteredData,
+  getFillColor,
+} from '../utils/mapUtils';
 import MapResetButton from './components/MapResetButton';
 
 const MAP_FILE_PATH = `https://raw.githubusercontent.com/devinit/economic-poverty-factsheet-viz/${ACTIVE_BRANCH}/src/data/world_map.geo.json`;
@@ -39,7 +45,7 @@ const getColor = (value, minValue, maxValue, increment) => {
     values.push(i);
   }
 
-  const colors = ['#0c457b', '#0071b1', '#0089cc', '#5da3d9', '#77adde', '#88bae5', '#bcd4f0', '#d3e0f4'];
+  const colors = ['#0071b1', '#0089cc', '#5da3d9', '#77adde', '#88bae5', '#bcd4f0', '#d3e0f4'];
   const colorGen = chroma.scale(colors).domain(values);
 
   return colorGen(value);
@@ -51,7 +57,7 @@ const renderMap = (mapInstance, geoJsonData, groupInstance, csvData, dimensionVa
   const legendInstanceCopy = legendInstance;
   legendInstanceCopy.onAdd = function () {
     const div = window.L.DomUtil.create('div', 'legend');
-    const legendColors = ['#0c457b', '#0071b1', '#0089cc', '#5da3d9', '#77adde', '#88bae5', '#bcd4f0', '#d3e0f4'];
+    const legendColors = ['#0071b1', '#0089cc', '#5da3d9', '#77adde', '#88bae5', '#bcd4f0', '#d3e0f4'];
     const legendContent = `${legendColors
       .map(
         (color) =>
@@ -71,21 +77,9 @@ const renderMap = (mapInstance, geoJsonData, groupInstance, csvData, dimensionVa
   legendInstanceCopy.addTo(mapInstance);
 
   const dimensionData = variableData.find((item) => item.variable === dimensionVariable);
+
   const style = (feature) => ({
-    fillColor:
-      dimensionVariable === 'progresspoorpop'
-        ? getColor(
-            Number(feature.properties[dimensionVariable]) / 1000000,
-            dimensionData.minValue,
-            dimensionData.maxValue,
-            dimensionData.scale
-          )
-        : getColor(
-            Number(feature.properties[dimensionVariable]) * 100,
-            dimensionData.minValue,
-            dimensionData.maxValue,
-            dimensionData.scale
-          ),
+    fillColor: getFillColor(feature, dimensionData, dimensionVariable, getColor),
     weight: 1,
     opacity: 1,
     color: 'white',
