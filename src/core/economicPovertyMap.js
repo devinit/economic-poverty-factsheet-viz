@@ -182,6 +182,17 @@ function renderEconomicPovertyMap() {
                     stateProperty: 'povertyRegion',
                     defaultValue: { value: 'all', label: 'All' },
                   },
+                  {
+                    label: 'Select poverty line',
+                    options: [
+                      { value: '2.15', label: 'US$2.15 per day' },
+                      { value: '3.65', label: 'US$3.65 per day' },
+                      { value: '6.85', label: 'US$6.85 per day' },
+                    ],
+                    classPrefix: 'poverty-line-select',
+                    stateProperty: 'mapPovertyLine',
+                    defaultValue: { value: '2.15', label: '2.15' },
+                  },
                 ];
                 const filterWrapper = addFilterWrapper(chartNode);
 
