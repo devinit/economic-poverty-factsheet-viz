@@ -1,3 +1,22 @@
+const variableData = [
+  {
+    variable: 'progresspoorpop',
+    minValue: -50,
+    maxValue: 900,
+    scale: 10,
+    label: 'Change in number of people in poverty',
+    unit: 'million',
+  },
+  {
+    variable: 'progressHC',
+    minValue: -70,
+    maxValue: 100,
+    scale: 5,
+    label: 'Percentage of people leaving poverty',
+    unit: '%',
+  },
+];
+
 const highlightFeature = (e, variable, filterOptions) => {
   const layer = e.target;
 
@@ -64,15 +83,40 @@ const getRegions = (data) => Array.from(new Set(data.map((item) => item.PIP_Regi
 
 const getLineFilteredData = (data, line) => data.filter((item) => item.poverty_line === line);
 
-const getFillColor = (feature, data, variable, colorFunction) => {
+const getColor = (value, minValue, maxValue, increment, chromaInstance) => {
+  // Generate a range of values between the minimum and maximum value
+  const values = [];
+  for (let i = minValue; i <= maxValue; i += increment) {
+    values.push(i);
+  }
+
+  const colors = ['#0071b1', '#0089cc', '#5da3d9', '#77adde', '#88bae5', '#bcd4f0', '#d3e0f4'];
+  const colorGen = chromaInstance.scale(colors).domain(values);
+
+  return colorGen(value);
+};
+
+const getFillColor = (feature, data, variable, colorFunction, colorGenInstance) => {
   if (!feature.properties[variable]) {
     return '#E6E1E5';
   }
   if (variable === 'progresspoorpop') {
-    return colorFunction(Number(feature.properties[variable]) / 1000000, data.minValue, data.maxValue, data.scale);
+    return colorFunction(
+      Number(feature.properties[variable]) / 1000000,
+      data.minValue,
+      data.maxValue,
+      data.scale,
+      colorGenInstance
+    );
   }
 
-  return colorFunction(Number(feature.properties[variable]) * 100, data.minValue, data.maxValue, data.scale);
+  return colorFunction(
+    Number(feature.properties[variable]) * 100,
+    data.minValue,
+    data.maxValue,
+    data.scale,
+    colorGenInstance
+  );
 };
 
-export { highlightFeature, dataInjectedGeoJson, getRegions, getLineFilteredData, getFillColor };
+export { highlightFeature, dataInjectedGeoJson, getRegions, getLineFilteredData, getFillColor, getColor, variableData };

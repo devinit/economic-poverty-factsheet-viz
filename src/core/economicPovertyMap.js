@@ -10,6 +10,8 @@ import {
   getRegions,
   getLineFilteredData,
   getFillColor,
+  getColor,
+  variableData,
 } from '../utils/mapUtils';
 import MapResetButton from './components/MapResetButton';
 
@@ -18,38 +20,6 @@ const CSV_PATH = `https://raw.githubusercontent.com/devinit/economic-poverty-fac
 const defaultPovertyData = 'progresspoorpop';
 const defaultRegion = 'all';
 const defaultPovertyLine = '2.15';
-
-const variableData = [
-  {
-    variable: 'progresspoorpop',
-    minValue: -50,
-    maxValue: 900,
-    scale: 10,
-    label: 'Change in number of people in poverty',
-    unit: 'million',
-  },
-  {
-    variable: 'progressHC',
-    minValue: -70,
-    maxValue: 100,
-    scale: 5,
-    label: 'Percentage of people leaving poverty',
-    unit: '%',
-  },
-];
-
-const getColor = (value, minValue, maxValue, increment) => {
-  // Generate a range of values between the minimum and maximum value
-  const values = [];
-  for (let i = minValue; i <= maxValue; i += increment) {
-    values.push(i);
-  }
-
-  const colors = ['#0071b1', '#0089cc', '#5da3d9', '#77adde', '#88bae5', '#bcd4f0', '#d3e0f4'];
-  const colorGen = chroma.scale(colors).domain(values);
-
-  return colorGen(value);
-};
 
 const renderMap = (mapInstance, geoJsonData, groupInstance, csvData, dimensionVariable, legendInstance) => {
   let geojsonLayer;
@@ -79,7 +49,7 @@ const renderMap = (mapInstance, geoJsonData, groupInstance, csvData, dimensionVa
   const dimensionData = variableData.find((item) => item.variable === dimensionVariable);
 
   const style = (feature) => ({
-    fillColor: getFillColor(feature, dimensionData, dimensionVariable, getColor),
+    fillColor: getFillColor(feature, dimensionData, dimensionVariable, getColor, chroma),
     weight: 1,
     opacity: 1,
     color: 'white',
@@ -157,7 +127,6 @@ function renderEconomicPovertyMap() {
               const fg = window.L.featureGroup().addTo(map);
               const geojsonData = jsonData.features;
               fetchCSVData(CSV_PATH).then((data) => {
-                // const countries = Array.from(new Set(data.map((stream) => stream.country_name)));
                 const regions = getRegions(data);
                 const dropDownData = [
                   {
