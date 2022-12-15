@@ -4,13 +4,14 @@ import { createRoot } from 'react-dom/client';
 import fetchCSVData, { ACTIVE_BRANCH } from '../utils/data';
 import { addFilterWrapper } from '../widgets/filters';
 import Selectors from './components/Selectors';
-import { dataInjectedGeoJson, highlightFeature, getRegions } from '../utils/mapUtils';
+import { dataInjectedGeoJson, highlightFeature, getRegions, getLineFilteredData } from '../utils/mapUtils';
 import MapResetButton from './components/MapResetButton';
 
 const MAP_FILE_PATH = `https://raw.githubusercontent.com/devinit/economic-poverty-factsheet-viz/${ACTIVE_BRANCH}/src/data/world_map.geo.json`;
 const CSV_PATH = `https://raw.githubusercontent.com/devinit/economic-poverty-factsheet-viz/${ACTIVE_BRANCH}/src/data/map_data.csv`;
 const defaultPovertyData = 'progresspoorpop';
 const defaultRegion = 'all';
+const defaultPovertyLine = '2.15';
 
 const variableData = [
   {
@@ -191,7 +192,7 @@ function renderEconomicPovertyMap() {
                     ],
                     classPrefix: 'poverty-line-select',
                     stateProperty: 'mapPovertyLine',
-                    defaultValue: { value: '2.15', label: '2.15' },
+                    defaultValue: { value: '2.15', label: 'US$2.15 per day' },
                   },
                 ];
                 const filterWrapper = addFilterWrapper(chartNode);
@@ -220,20 +221,31 @@ function renderEconomicPovertyMap() {
                   dichart.showLoading();
                   let povertyRegion = defaultRegion;
                   let povertyData = defaultPovertyData;
+                  let povertyLine = defaultPovertyLine;
                   window.DIState.addListener(() => {
-                    const { povertyRegion: selectedPovertyRegion, povertyData: selectedPovertyData } =
-                      window.DIState.getState;
+                    const {
+                      povertyRegion: selectedPovertyRegion,
+                      povertyData: selectedPovertyData,
+                      mapPovertyLine: selectedPovertyLine,
+                    } = window.DIState.getState;
 
                     // only update if povertyData or povertyRegion have changed
-                    if (povertyRegion === selectedPovertyRegion && povertyData === selectedPovertyData) return;
+                    if (
+                      povertyRegion === selectedPovertyRegion &&
+                      povertyData === selectedPovertyData &&
+                      povertyLine === selectedPovertyLine
+                    )
+                      return;
 
                     povertyRegion = selectedPovertyRegion || defaultRegion;
                     povertyData = selectedPovertyData || defaultPovertyData;
+                    povertyLine = selectedPovertyLine || defaultPovertyLine;
+                    const lineFilteredData = getLineFilteredData(data, povertyLine);
                     renderMap(
                       map,
-                      dataInjectedGeoJson(geojsonData, data, povertyRegion),
+                      dataInjectedGeoJson(geojsonData, lineFilteredData, povertyRegion),
                       fg,
-                      data,
+                      lineFilteredData,
                       povertyData,
                       legend
                     );

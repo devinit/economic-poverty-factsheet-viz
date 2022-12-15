@@ -27,12 +27,15 @@ const highlightFeature = (e, variable, filterOptions) => {
     .openTooltip();
 };
 
+const outliers = ['France', 'Kosovo', 'Norway'];
 const dataInjectedGeoJson = (jsonData, csvData, region) =>
   jsonData.map((feature) => {
     const featureCopy = { ...feature };
     if (region === 'all') {
-      const matchingCountryData = csvData.find(
-        (countryData) => countryData.country_name === feature.properties.WB_NAME
+      const matchingCountryData = csvData.find((countryData) =>
+        outliers.includes(countryData.country_name)
+          ? countryData.ISO_A3 === feature.properties.WB_A3
+          : countryData.ISO_A3 === feature.properties.ISO_A3
       );
       if (matchingCountryData) {
         featureCopy.properties = {
@@ -41,8 +44,10 @@ const dataInjectedGeoJson = (jsonData, csvData, region) =>
         };
       }
     } else {
-      const matchingCountryData = csvData.find(
-        (countryData) => countryData.country_name === feature.properties.WB_NAME && countryData.PIP_Region === region
+      const matchingCountryData = csvData.find((countryData) =>
+        outliers.includes(countryData.country_name)
+          ? countryData.ISO_A3 === feature.properties.WB_A3
+          : countryData.ISO_A3 === feature.properties.ISO_A3 && countryData.PIP_Region === region
       );
       if (matchingCountryData) {
         featureCopy.properties = {
@@ -57,4 +62,6 @@ const dataInjectedGeoJson = (jsonData, csvData, region) =>
 
 const getRegions = (data) => Array.from(new Set(data.map((item) => item.PIP_Region)));
 
-export { highlightFeature, dataInjectedGeoJson, getRegions };
+const getLineFilteredData = (data, line) => data.filter((item) => item.poverty_line === line);
+
+export { highlightFeature, dataInjectedGeoJson, getRegions, getLineFilteredData };
