@@ -129,7 +129,7 @@ function renderEconomicPovertyMap() {
                 const regions = getRegions(data);
                 const dropDownData = [
                   {
-                    label: 'Select poverty data',
+                    label: 'Select poverty data type',
                     options: [
                       { value: 'progresspoorpop', label: 'Change in number of people in poverty' },
                       { value: 'progressHC', label: 'Percentage of people leaving poverty' },
