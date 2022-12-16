@@ -13,6 +13,7 @@ import {
   getColor,
   variableData,
   getMaxMinValues,
+  regionMapping,
 } from '../utils/mapUtils';
 import MapResetButton from './components/MapResetButton';
 
@@ -139,7 +140,12 @@ function renderEconomicPovertyMap() {
                   },
                   {
                     label: 'Select region',
-                    options: [{ value: 'all', label: 'All' }].concat(regions.map((value) => ({ value, label: value }))),
+                    options: [{ value: 'all', label: 'All' }].concat(
+                      regions.map((value) => ({
+                        value,
+                        label: regionMapping.find((item) => item.name === value).label,
+                      }))
+                    ),
                     classPrefix: 'region-select',
                     stateProperty: 'povertyRegion',
                     defaultValue: { value: 'all', label: 'All' },
@@ -202,7 +208,7 @@ function renderEconomicPovertyMap() {
                     povertyData = selectedPovertyData || defaultPovertyData;
                     povertyLine = selectedPovertyLine || defaultPovertyLine;
                     const filteredData = getFilteredData(data, povertyLine, povertyRegion);
-                    window.console.log(getMaxMinValues(filteredData, povertyData));
+
                     renderMap(
                       map,
                       dataInjectedGeoJson(geojsonData, filteredData),

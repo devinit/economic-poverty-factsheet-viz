@@ -1,4 +1,14 @@
 const colors = ['#0c457b', '#0071b1', '#0089cc', '#5da3d9', '#77adde', '#88bae5', '#bcd4f0', '#d3e0f4'];
+
+const regionMapping = [
+  { name: 'ECA', label: 'Europe & Central Asia' },
+  { name: 'MNA', label: 'Middle East & North Africa' },
+  { name: 'SSA', label: 'Sub-Saharan Africa' },
+  { name: 'OHI', label: 'Other High Income Countries' },
+  { name: 'SAS', label: 'South Asia' },
+  { name: 'LAC', label: 'Latin America & Caribbean' },
+  { name: 'EAP', label: 'East Asia & Pacific' },
+];
 const variableData = [
   {
     variable: 'progresspoorpop',
@@ -63,10 +73,7 @@ const dataInjectedGeoJson = (jsonData, csvData) =>
 const getRegions = (data) => Array.from(new Set(data.map((item) => item.PIP_Region)));
 
 const getFilteredData = (data, line, region) => {
-  window.console.log(region);
   if (region === 'all') {
-    window.console.log(data.filter((item) => item.poverty_line === line));
-
     return data.filter((item) => item.poverty_line === line);
   }
 
@@ -119,7 +126,13 @@ const getMaxMinValues = (data, dataType) => {
     };
   }
 
-  return { maxValue: Math.ceil(Math.max(...dataList) * 100), minValue: Math.ceil(Math.min(...dataList) * 100) };
+  return {
+    maxValue: Math.ceil(Math.max(...dataList) * 100),
+    minValue:
+      Math.sign(Math.ceil(Math.min(...dataList) / 1000000)) === -1
+        ? Math.ceil(Math.min(...dataList) * 100) - 1
+        : Math.ceil(Math.min(...dataList) * 100),
+  };
 };
 export {
   highlightFeature,
@@ -130,4 +143,5 @@ export {
   getColor,
   variableData,
   getMaxMinValues,
+  regionMapping,
 };
