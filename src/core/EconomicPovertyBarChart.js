@@ -8,7 +8,7 @@ import Select from '../components/Select';
 import ChartFilters from '../components/ChartFilters';
 
 const dataFile = `https://raw.githubusercontent.com/devinit/economic-poverty-factsheet-viz/${ACTIVE_BRANCH}/src/data/barChartData.csv`;
-const defaultPovertyLine = 'all';
+const defaultPovertyLine = '2.15';
 
 const getYears = (data) => Array.from(new Set(data.map((item) => item.year)));
 
@@ -25,21 +25,15 @@ const getSeries = (dataArray, years, filterValue) => {
     },
     data: years.map((year) => {
       const yearList = [];
-      if (filterValue !== defaultPovertyLine) {
-        dataArray
-          .filter((item) => item['poverty line (2017 PPP)'] === filterValue)
-          .forEach((item) => {
-            if (item['Region name'] === seriesName && item.year === year) {
-              yearList.push(Number(Number(item['Population in poverty (billions)']).toFixed(4)));
-            }
-          });
-      } else {
-        dataArray.forEach((item) => {
+
+      dataArray
+        .filter((item) => item['poverty line (2017 PPP)'] === filterValue)
+        .forEach((item) => {
           if (item['Region name'] === seriesName && item.year === year) {
-            yearList.push(Number(item['Population in poverty (billions)']));
+            yearList.push(Number(Number(item['Population in poverty (billions)']).toFixed(4)));
           }
         });
-      }
+
       const accumulatedYearValue = yearList.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
       return accumulatedYearValue.toFixed(4);
@@ -71,14 +65,13 @@ const renderEconomicPovertyBarchart = () => {
               <Select
                 label="Select poverty line"
                 options={[
-                  { value: 'all', label: 'All' },
                   { value: '2.15', label: 'US$2.15 per day' },
                   { value: '3.65', label: 'US$3.65 per day' },
                   { value: '6.85', label: 'US$6.85 per day' },
                 ]}
                 classNamePrefix="poverty-line-select"
                 isClearable={false}
-                defaultValue={[{ value: 'all', label: 'All', isCloseable: true }]}
+                defaultValue={[{ value: '2.15', label: 'US$2.15 per day', isCloseable: true }]}
                 onChange={(item) => {
                   window.DIState.setState({ povertyLine: item.value });
                 }}
