@@ -1,10 +1,7 @@
 import { parse } from 'papaparse';
 
-<<<<<<< HEAD
-export const ACTIVE_BRANCH = 'feature/map-initial-setup';
-=======
+// export const ACTIVE_BRANCH = 'feature/map-initial-setup';
 export const ACTIVE_BRANCH = 'feature/bar-chart';
->>>>>>> 46f7a86 ( Add chart x axis data)
 
 const fetchCSVData = (url) =>
   new Promise((resolve) => {
