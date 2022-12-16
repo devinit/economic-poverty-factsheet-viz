@@ -12,6 +12,7 @@ import {
   getFillColor,
   getColor,
   variableData,
+  getMaxMinValues,
 } from '../utils/mapUtils';
 import MapResetButton from './components/MapResetButton';
 
@@ -23,11 +24,12 @@ const defaultPovertyLine = '2.15';
 
 const renderMap = (mapInstance, geoJsonData, groupInstance, csvData, dimensionVariable, legendInstance) => {
   let geojsonLayer;
+  const scaleData = getMaxMinValues(csvData, dimensionVariable);
 
   const legendInstanceCopy = legendInstance;
   legendInstanceCopy.onAdd = function () {
     const div = window.L.DomUtil.create('div', 'legend');
-    const legendColors = ['#0071b1', '#0089cc', '#5da3d9', '#77adde', '#88bae5', '#bcd4f0', '#d3e0f4'];
+    const legendColors = ['#0c457b', '#0071b1', '#0089cc', '#5da3d9', '#77adde', '#88bae5', '#bcd4f0', '#d3e0f4'];
     const legendContent = `${legendColors
       .map(
         (color) =>
@@ -35,9 +37,7 @@ const renderMap = (mapInstance, geoJsonData, groupInstance, csvData, dimensionVa
           <i style="background:${color};border-radius:1px;margin-right:0;width:40px;"></i>
         </span>`
       )
-      .join('')} <p style="margin-left:1px;margin-top: 4px;">${
-      variableData.find((item) => item.variable === dimensionVariable).minValue
-    } - ${variableData.find((item) => item.variable === dimensionVariable).maxValue}${
+      .join('')} <p style="margin-left:1px;margin-top: 4px;">${scaleData.minValue} - ${scaleData.maxValue}${
       dimensionVariable === 'progressHC' ? ', % of population' : ', millions of people'
     }</p>`;
     div.innerHTML = legendContent;
@@ -46,10 +46,8 @@ const renderMap = (mapInstance, geoJsonData, groupInstance, csvData, dimensionVa
   };
   legendInstanceCopy.addTo(mapInstance);
 
-  const dimensionData = variableData.find((item) => item.variable === dimensionVariable);
-
   const style = (feature) => ({
-    fillColor: getFillColor(feature, dimensionData, dimensionVariable, getColor, chroma),
+    fillColor: getFillColor(feature, dimensionVariable, getColor, chroma, scaleData),
     weight: 1,
     opacity: 1,
     color: 'white',
@@ -204,6 +202,7 @@ function renderEconomicPovertyMap() {
                     povertyData = selectedPovertyData || defaultPovertyData;
                     povertyLine = selectedPovertyLine || defaultPovertyLine;
                     const filteredData = getFilteredData(data, povertyLine, povertyRegion);
+                    window.console.log(getMaxMinValues(filteredData, povertyData));
                     renderMap(
                       map,
                       dataInjectedGeoJson(geojsonData, filteredData),

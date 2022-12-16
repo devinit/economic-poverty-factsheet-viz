@@ -1,17 +1,12 @@
+const colors = ['#0c457b', '#0071b1', '#0089cc', '#5da3d9', '#77adde', '#88bae5', '#bcd4f0', '#d3e0f4'];
 const variableData = [
   {
     variable: 'progresspoorpop',
-    minValue: -50,
-    maxValue: 900,
-    scale: 10,
     label: 'Change in number of people in poverty',
     unit: 'million',
   },
   {
     variable: 'progressHC',
-    minValue: -70,
-    maxValue: 100,
-    scale: 5,
     label: 'Percentage of people leaving poverty',
     unit: '%',
   },
@@ -84,34 +79,52 @@ const getColor = (value, minValue, maxValue, increment, chromaInstance) => {
   for (let i = minValue; i <= maxValue; i += increment) {
     values.push(i);
   }
-
-  const colors = ['#0071b1', '#0089cc', '#5da3d9', '#77adde', '#88bae5', '#bcd4f0', '#d3e0f4'];
   const colorGen = chromaInstance.scale(colors).domain(values);
 
   return colorGen(value);
 };
 
-const getFillColor = (feature, data, variable, colorFunction, colorGenInstance) => {
+const getFillColor = (feature, variable, colorFunction, colorGenInstance, scaleData) => {
+  const interval = (scaleData.maxValue - scaleData.minValue) / colors.length;
   if (!feature.properties[variable]) {
     return '#E6E1E5';
   }
   if (variable === 'progresspoorpop') {
     return colorFunction(
       Number(feature.properties[variable]) / 1000000,
-      data.minValue,
-      data.maxValue,
-      data.scale,
+      scaleData.minValue,
+      scaleData.maxValue,
+      interval,
       colorGenInstance
     );
   }
 
   return colorFunction(
     Number(feature.properties[variable]) * 100,
-    data.minValue,
-    data.maxValue,
-    data.scale,
+    scaleData.minValue,
+    scaleData.maxValue,
+    interval,
     colorGenInstance
   );
 };
+const getMaxMinValues = (data, dataType) => {
+  const dataList = data.map((item) => Number(item[dataType]));
+  if (dataType === 'progresspoorpop') {
+    return {
+      maxValue: Math.ceil(Math.max(...dataList) / 1000000),
+      minValue: Math.ceil(Math.min(...dataList) / 1000000),
+    };
+  }
 
-export { highlightFeature, dataInjectedGeoJson, getRegions, getFilteredData, getFillColor, getColor, variableData };
+  return { maxValue: Math.ceil(Math.max(...dataList) * 100), minValue: Math.ceil(Math.min(...dataList) * 100) };
+};
+export {
+  highlightFeature,
+  dataInjectedGeoJson,
+  getRegions,
+  getFilteredData,
+  getFillColor,
+  getColor,
+  variableData,
+  getMaxMinValues,
+};
