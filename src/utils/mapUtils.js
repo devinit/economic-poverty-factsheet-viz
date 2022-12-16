@@ -36,7 +36,7 @@ const highlightFeature = (e, variable, filterOptions) => {
       }<span style="padding-left: 2px;">${
         filterOptions.find((option) => option.variable === variable).unit
       }</span></div>`,
-      { direction: 'top', opacity: 1 }
+      { direction: 'bottom', opacity: 1, sticky: true }
     )
     .openTooltip();
 };
