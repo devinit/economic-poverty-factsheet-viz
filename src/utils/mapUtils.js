@@ -112,7 +112,10 @@ const getMaxMinValues = (data, dataType) => {
   if (dataType === 'progresspoorpop') {
     return {
       maxValue: Math.ceil(Math.max(...dataList) / 1000000),
-      minValue: Math.ceil(Math.min(...dataList) / 1000000),
+      minValue:
+        Math.sign(Math.ceil(Math.min(...dataList) / 1000000)) === -1
+          ? Math.ceil(Math.min(...dataList) / 1000000) - 1
+          : Math.ceil(Math.min(...dataList) / 1000000),
     };
   }
 
