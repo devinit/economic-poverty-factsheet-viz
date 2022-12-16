@@ -8,7 +8,7 @@ import {
   dataInjectedGeoJson,
   highlightFeature,
   getRegions,
-  getLineFilteredData,
+  getFilteredData,
   getFillColor,
   getColor,
   variableData,
@@ -203,12 +203,12 @@ function renderEconomicPovertyMap() {
                     povertyRegion = selectedPovertyRegion || defaultRegion;
                     povertyData = selectedPovertyData || defaultPovertyData;
                     povertyLine = selectedPovertyLine || defaultPovertyLine;
-                    const lineFilteredData = getLineFilteredData(data, povertyLine);
+                    const filteredData = getFilteredData(data, povertyLine, povertyRegion);
                     renderMap(
                       map,
-                      dataInjectedGeoJson(geojsonData, lineFilteredData, povertyRegion),
+                      dataInjectedGeoJson(geojsonData, filteredData),
                       fg,
-                      lineFilteredData,
+                      filteredData,
                       povertyData,
                       legend
                     );

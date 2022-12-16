@@ -47,33 +47,19 @@ const highlightFeature = (e, variable, filterOptions) => {
 };
 
 const outliers = ['France', 'Kosovo', 'Norway'];
-const dataInjectedGeoJson = (jsonData, csvData, region) =>
+const dataInjectedGeoJson = (jsonData, csvData) =>
   jsonData.map((feature) => {
     const featureCopy = { ...feature };
-    if (region === 'all') {
-      const matchingCountryData = csvData.find((countryData) =>
-        outliers.includes(countryData.country_name)
-          ? countryData.ISO_A3 === feature.properties.WB_A3
-          : countryData.ISO_A3 === feature.properties.ISO_A3
-      );
-      if (matchingCountryData) {
-        featureCopy.properties = {
-          ...feature.properties,
-          ...matchingCountryData,
-        };
-      }
-    } else {
-      const matchingCountryData = csvData.find((countryData) =>
-        outliers.includes(countryData.country_name)
-          ? countryData.ISO_A3 === feature.properties.WB_A3
-          : countryData.ISO_A3 === feature.properties.ISO_A3 && countryData.PIP_Region === region
-      );
-      if (matchingCountryData) {
-        featureCopy.properties = {
-          ...feature.properties,
-          ...matchingCountryData,
-        };
-      }
+    const matchingCountryData = csvData.find((countryData) =>
+      outliers.includes(countryData.country_name)
+        ? countryData.ISO_A3 === feature.properties.WB_A3
+        : countryData.ISO_A3 === feature.properties.ISO_A3
+    );
+    if (matchingCountryData) {
+      featureCopy.properties = {
+        ...feature.properties,
+        ...matchingCountryData,
+      };
     }
 
     return featureCopy;
@@ -81,7 +67,16 @@ const dataInjectedGeoJson = (jsonData, csvData, region) =>
 
 const getRegions = (data) => Array.from(new Set(data.map((item) => item.PIP_Region)));
 
-const getLineFilteredData = (data, line) => data.filter((item) => item.poverty_line === line);
+const getFilteredData = (data, line, region) => {
+  window.console.log(region);
+  if (region === 'all') {
+    window.console.log(data.filter((item) => item.poverty_line === line));
+
+    return data.filter((item) => item.poverty_line === line);
+  }
+
+  return data.filter((item) => item.poverty_line === line && item.PIP_Region === region);
+};
 
 const getColor = (value, minValue, maxValue, increment, chromaInstance) => {
   // Generate a range of values between the minimum and maximum value
@@ -119,4 +114,4 @@ const getFillColor = (feature, data, variable, colorFunction, colorGenInstance) 
   );
 };
 
-export { highlightFeature, dataInjectedGeoJson, getRegions, getLineFilteredData, getFillColor, getColor, variableData };
+export { highlightFeature, dataInjectedGeoJson, getRegions, getFilteredData, getFillColor, getColor, variableData };
