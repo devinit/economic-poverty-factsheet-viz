@@ -43,6 +43,39 @@ export const mixedColourWay = () => {
   );
 };
 
+export const legendSelection = (chart, params) => {
+  const obj = params.selected;
+  const selectAll = Object.values(obj).filter((f) => f).length;
+  chart.setOption({ animation: true });
+
+  if (selectAll === 0) {
+    // select all on second click
+    Object.keys(obj).forEach((key) => {
+      chart.dispatchAction({
+        type: 'legendSelect',
+        name: key,
+      });
+    });
+  } else if (!obj[params.name]) {
+    // If user has unselected an item
+    // Re-select what the user unselected
+    chart.dispatchAction({
+      type: 'legendSelect',
+      name: params.name,
+    });
+
+    // Deselect everything else
+    Object.keys(obj).forEach((key) => {
+      if (Object.prototype.hasOwnProperty.call(obj, key) && key !== params.name) {
+        chart.dispatchAction({
+          type: 'legendUnSelect',
+          name: key,
+        });
+      }
+    });
+  }
+};
+
 // default echart options for DI charts
 const defaultOptions = {
   color: colorways.default.concat(colorways.rainbow),

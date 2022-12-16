@@ -1,7 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import deepMerge from 'deepmerge';
-import defaultOptions, { colorways, handleResize } from '../charts/echarts/index';
+import defaultOptions, { colorways, handleResize, legendSelection } from '../charts/echarts/index';
 import fetchCSVData, { ACTIVE_BRANCH } from '../utils/data';
 import { addFilterWrapper } from '../widgets/filters';
 import Select from '../components/Select';
@@ -107,6 +107,9 @@ const renderEconomicPovertyBarchart = () => {
                 };
                 defaultOptions.color = colorways.bluebell;
                 chart.setOption(deepMerge(defaultOptions, options));
+                chart.on('legendselectchanged', (params) => {
+                  legendSelection(chart, params);
+                });
 
                 dichart.hideLoading();
               });
