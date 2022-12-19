@@ -20,9 +20,6 @@ const getSeries = (dataArray, years, filterValue) => {
     name: seriesName,
     type: 'bar',
     stack: 'Region',
-    emphasis: {
-      focus: 'series',
-    },
     data: years.map((year) => {
       const yearList = [];
 
@@ -36,7 +33,12 @@ const getSeries = (dataArray, years, filterValue) => {
 
       const accumulatedYearValue = yearList.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
-      return accumulatedYearValue.toFixed(4);
+      return {
+        value: accumulatedYearValue.toFixed(4),
+        emphasis: {
+          focus: 'self',
+        },
+      };
     }),
   }));
 
