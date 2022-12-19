@@ -41,8 +41,8 @@ const highlightFeature = (e, variable, filterOptions) => {
         filterOptions.find((option) => option.variable === variable).label
       }: ${
         variable === 'progresspoorpop'
-          ? (Number(layer.feature.properties[variable]) / 1000000).toFixed(4)
-          : (Number(layer.feature.properties[variable]) * 100).toFixed(3)
+          ? (Number(layer.feature.properties[variable]) / 1000000).toFixed(2)
+          : (Number(layer.feature.properties[variable]) * 100).toFixed(2)
       }<span style="padding-left: 2px;">${
         filterOptions.find((option) => option.variable === variable).unit
       }</span></div>`,

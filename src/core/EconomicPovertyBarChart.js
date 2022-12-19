@@ -25,7 +25,7 @@ const getSeries = (dataArray, years, filterValue) => {
       if (filterValue === defaultPovertyLine) {
         dataArray.forEach((item) => {
           if (item['Region name'] === seriesName && item.year === year) {
-            yearList.push(Number(Number(item['Population in poverty (billions)']).toFixed(4)));
+            yearList.push(Number(Number(item['Population in poverty (billions)']).toFixed(2)));
           }
         });
       } else {
@@ -33,7 +33,7 @@ const getSeries = (dataArray, years, filterValue) => {
           .filter((item) => item['poverty line (2017 PPP)'] === filterValue)
           .forEach((item) => {
             if (item['Region name'] === seriesName && item.year === year) {
-              yearList.push(Number(Number(item['Population in poverty (billions)']).toFixed(4)));
+              yearList.push(Number(Number(item['Population in poverty (billions)']).toFixed(2)));
             }
           });
       }
@@ -41,7 +41,7 @@ const getSeries = (dataArray, years, filterValue) => {
       const accumulatedYearValue = yearList.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
       return {
-        value: accumulatedYearValue.toFixed(4),
+        value: accumulatedYearValue.toFixed(2),
         emphasis: {
           focus: 'self',
         },
