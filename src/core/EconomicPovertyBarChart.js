@@ -20,6 +20,14 @@ const getSeries = (dataArray, years, filterValue) => {
     name: seriesName,
     type: 'bar',
     stack: 'Region',
+    tooltip: {
+      trigger: 'item',
+      formatter: (params) => {
+        window.console.log(params);
+
+        return `${params.seriesName} <br> <strong>${params.name}: ${params.value}</strong> billion`;
+      },
+    },
     data: years.map((year) => {
       const yearList = [];
       if (filterValue === defaultPovertyLine) {
