@@ -129,7 +129,7 @@ const getMaxMinValues = (data, dataType) => {
   return {
     maxValue: Math.ceil(Math.max(...dataList) * 100),
     minValue:
-      Math.sign(Math.ceil(Math.min(...dataList) / 1000000)) === -1
+      Math.sign(Math.ceil(Math.min(...dataList) * 100)) === -1
         ? Math.ceil(Math.min(...dataList) * 100) - 1
         : Math.ceil(Math.min(...dataList) * 100),
   };
