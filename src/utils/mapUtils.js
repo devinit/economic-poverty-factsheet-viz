@@ -17,7 +17,7 @@ const variableData = [
   },
   {
     variable: 'progressHC',
-    label: 'Percentage of people leaving poverty',
+    label: 'Percentage of people living in poverty',
     unit: '%',
   },
 ];
