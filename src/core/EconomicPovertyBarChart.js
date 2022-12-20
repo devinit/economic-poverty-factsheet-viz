@@ -8,7 +8,7 @@ import Select from '../components/Select';
 import ChartFilters from '../components/ChartFilters';
 
 const dataFile = `https://raw.githubusercontent.com/devinit/economic-poverty-factsheet-viz/${ACTIVE_BRANCH}/src/data/barChartData.csv`;
-const defaultPovertyLine = '2.15';
+const defaultPovertyLine = 'all';
 
 const getYears = (data) => Array.from(new Set(data.map((item) => item.year)));
 
@@ -20,23 +20,36 @@ const getSeries = (dataArray, years, filterValue) => {
     name: seriesName,
     type: 'bar',
     stack: 'Region',
-    emphasis: {
-      focus: 'series',
+    tooltip: {
+      trigger: 'item',
+      formatter: (params) => `${params.seriesName} <br> <strong>${params.name}: ${params.value}</strong> billion`,
     },
     data: years.map((year) => {
       const yearList = [];
-
-      dataArray
-        .filter((item) => item['poverty line (2017 PPP)'] === filterValue)
-        .forEach((item) => {
+      if (filterValue === defaultPovertyLine) {
+        dataArray.forEach((item) => {
           if (item['Region name'] === seriesName && item.year === year) {
-            yearList.push(Number(Number(item['Population in poverty (billions)']).toFixed(4)));
+            yearList.push(Number(Number(item['Population in poverty (billions)']).toFixed(2)));
           }
         });
+      } else {
+        dataArray
+          .filter((item) => item['poverty line (2017 PPP)'] === filterValue)
+          .forEach((item) => {
+            if (item['Region name'] === seriesName && item.year === year) {
+              yearList.push(Number(Number(item['Population in poverty (billions)']).toFixed(2)));
+            }
+          });
+      }
 
       const accumulatedYearValue = yearList.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
-      return accumulatedYearValue.toFixed(4);
+      return {
+        value: accumulatedYearValue.toFixed(2),
+        emphasis: {
+          focus: 'self',
+        },
+      };
     }),
   }));
 
@@ -64,14 +77,14 @@ const renderEconomicPovertyBarchart = () => {
             <ChartFilters selectErrorMessage={selectErrorMessage}>
               <Select
                 label="Select poverty line"
-                options={[
+                options={[{ value: 'all', label: 'All' }].concat([
                   { value: '2.15', label: 'US$2.15 per day' },
                   { value: '3.65', label: 'US$3.65 per day' },
                   { value: '6.85', label: 'US$6.85 per day' },
-                ]}
+                ])}
                 classNamePrefix="poverty-line-select"
                 isClearable={false}
-                defaultValue={[{ value: '2.15', label: 'US$2.15 per day', isCloseable: true }]}
+                defaultValue={[{ value: 'all', label: 'All', isCloseable: true }]}
                 onChange={(item) => {
                   window.DIState.setState({ povertyLine: item.value });
                 }}

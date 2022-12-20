@@ -132,7 +132,7 @@ function renderEconomicPovertyMap() {
                     label: 'Select poverty data type',
                     options: [
                       { value: 'progresspoorpop', label: 'Change in number of people in poverty' },
-                      { value: 'progressHC', label: 'Percentage of people leaving poverty' },
+                      { value: 'progressHC', label: 'Percentage of people living in poverty' },
                     ],
                     classPrefix: 'poverty-data-select',
                     stateProperty: 'povertyData',
