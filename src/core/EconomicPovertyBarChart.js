@@ -22,11 +22,7 @@ const getSeries = (dataArray, years, filterValue) => {
     stack: 'Region',
     tooltip: {
       trigger: 'item',
-      formatter: (params) => {
-        window.console.log(params);
-
-        return `${params.seriesName} <br> <strong>${params.name}: ${params.value}</strong> billion`;
-      },
+      formatter: (params) => `${params.seriesName} <br> <strong>${params.name}: ${params.value}</strong> billion`,
     },
     data: years.map((year) => {
       const yearList = [];
