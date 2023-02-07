@@ -92,47 +92,95 @@ const getColor = (value, minValue, maxValue, increment, chromaInstance) => {
 };
 
 const getFillColor = (feature, variable, colorFunction, colorGenInstance, scaleData) => {
-  const interval = (scaleData.maxValue - scaleData.minValue) / colors.length;
+  // const interval = (scaleData.maxValue - scaleData.minValue) / colors.length;
+  const positiveInterval = (scaleData.positive.maxValue - scaleData.positive.minValue) / colors.length;
+  const negativeInterval = (scaleData.negative.maxValue - scaleData.negative.minValue) / colors.length;
   if (!feature.properties[variable]) {
     return '#E6E1E5';
   }
   if (variable === 'progresspoorpop') {
+    if (Number(feature.properties[variable]) / 1000000 >= 0) {
+      return colorFunction(
+        Number(feature.properties[variable]) / 1000000,
+        scaleData.positive.minValue,
+        scaleData.positive.maxValue,
+        positiveInterval,
+        colorGenInstance
+      );
+    }
+
     return colorFunction(
       Number(feature.properties[variable]) / 1000000,
-      scaleData.minValue,
-      scaleData.maxValue,
-      interval,
+      scaleData.negative.minValue,
+      scaleData.negative.maxValue,
+      negativeInterval,
       colorGenInstance
     );
   }
 
-  return colorFunction(
-    Number(feature.properties[variable]) * 100,
-    scaleData.minValue,
-    scaleData.maxValue,
-    interval,
-    colorGenInstance
-  );
+  return Number(feature.properties[variable]) / 1000000 >= 0
+    ? colorFunction(
+        Number(feature.properties[variable]) * 100,
+        scaleData.positive.minValue,
+        scaleData.positive.maxValue,
+        positiveInterval,
+        colorGenInstance
+      )
+    : colorFunction(
+        Number(feature.properties[variable]) * 100,
+        scaleData.negative.minValue,
+        scaleData.negative.maxValue,
+        negativeInterval,
+        colorGenInstance
+      );
 };
 const getMaxMinValues = (data, dataType) => {
   const dataList = data.map((item) => Number(item[dataType]));
+  const positiveDataList = dataList.filter((item) => item >= 0);
+  const negativeDataList = dataList.filter((item) => item < 0);
   if (dataType === 'progresspoorpop') {
-    return {
-      maxValue: Math.ceil(Math.max(...dataList) / 1000000),
-      minValue:
-        Math.sign(Math.ceil(Math.min(...dataList) / 1000000)) === -1
-          ? Math.ceil(Math.min(...dataList) / 1000000) - 1
-          : Math.ceil(Math.min(...dataList) / 1000000),
+    const mine = {
+      positive: {
+        maxValue: Math.ceil(Math.max(...positiveDataList) / 1000000),
+        minValue: Math.ceil(Math.min(...positiveDataList) / 1000000),
+      },
+      negative: {
+        maxValue: Math.ceil(Math.max(...negativeDataList) / 1000000),
+        minValue: Math.ceil(Math.min(...negativeDataList) / 1000000) - 1,
+      },
     };
+    console.log(mine);
+
+    // return {
+    //   maxValue: Math.ceil(Math.max(...dataList) / 1000000),
+    //   minValue:
+    //     Math.sign(Math.ceil(Math.min(...dataList) / 1000000)) === -1
+    //       ? Math.ceil(Math.min(...dataList) / 1000000) - 1
+    //       : Math.ceil(Math.min(...dataList) / 1000000),
+    // };
+    return mine;
   }
 
-  return {
-    maxValue: Math.ceil(Math.max(...dataList) * 100),
-    minValue:
-      Math.sign(Math.ceil(Math.min(...dataList) * 100)) === -1
-        ? Math.ceil(Math.min(...dataList) * 100) - 1
-        : Math.ceil(Math.min(...dataList) * 100),
+  const percentage = {
+    positive: {
+      maxValue: Math.ceil(Math.max(...positiveDataList) * 100),
+      minValue: Math.ceil(Math.min(...positiveDataList) * 100),
+    },
+    negative: {
+      maxValue: Math.ceil(Math.max(...negativeDataList) * 100),
+      minValue: Math.ceil(Math.min(...negativeDataList) * 100) - 1,
+    },
   };
+  console.log(percentage);
+
+  return percentage;
+  // return {
+  //   maxValue: Math.ceil(Math.max(...dataList) * 100),
+  //   minValue:
+  //     Math.sign(Math.ceil(Math.min(...dataList) * 100)) === -1
+  //       ? Math.ceil(Math.min(...dataList) * 100) - 1
+  //       : Math.ceil(Math.min(...dataList) * 100),
+  // };
 };
 export {
   highlightFeature,
