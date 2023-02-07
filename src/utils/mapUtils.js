@@ -1,4 +1,5 @@
-const colors = ['#0c457b', '#0071b1', '#0089cc', '#5da3d9', '#77adde', '#88bae5', '#bcd4f0', '#d3e0f4'];
+// const colors = ['#0c457b', '#0071b1', '#0089cc', '#5da3d9', '#77adde', '#88bae5', '#bcd4f0', '#d3e0f4'];
+const colors = ['#0c457b', '#0089cc', '#77adde', '#bcd4f0'];
 
 const regionMapping = [
   { name: 'ECA', label: 'Europe & Central Asia' },

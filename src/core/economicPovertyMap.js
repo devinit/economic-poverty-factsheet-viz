@@ -1,5 +1,6 @@
 import chroma from 'chroma-js';
 import React from 'react';
+import 'leaflet.pattern';
 import { createRoot } from 'react-dom/client';
 import fetchCSVData, { ACTIVE_BRANCH } from '../utils/data';
 import {
@@ -48,7 +49,15 @@ const renderMap = (mapInstance, geoJsonData, groupInstance, csvData, dimensionVa
   legendInstanceCopy.addTo(mapInstance);
 
   const style = (feature) => ({
-    fillColor: getFillColor(feature, dimensionVariable, getColor, chroma, scaleData),
+    [Number(feature.properties[dimensionVariable]) < 0 ? 'fillPattern' : 'fillColor']:
+      Number(feature.properties[dimensionVariable]) < 0
+        ? new window.L.StripePattern({
+            weight: 2,
+            spaceWeight: 1,
+            angle: 45,
+            color: getFillColor(feature, dimensionVariable, getColor, chroma, scaleData),
+          }).addTo(mapInstance)
+        : getFillColor(feature, dimensionVariable, getColor, chroma, scaleData),
     weight: 1,
     opacity: 1,
     color: 'white',
@@ -118,6 +127,9 @@ function renderEconomicPovertyMap() {
 
           // Reset button
           const resetButton = window.L.control({ position: 'bottomleft' });
+
+          // stripes
+          // const stripes = new window.L.StripePattern();
 
           window
             .fetch(MAP_FILE_PATH)
