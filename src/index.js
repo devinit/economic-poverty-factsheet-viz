@@ -1,6 +1,6 @@
-import './state';
-import renderEconomicPovertyMap from './core/EconomicPovertyMap';
 import renderEconomicPovertyBarchart from './core/EconomicPovertyBarChart';
+import renderEconomicPovertyMap from './core/EconomicPovertyMap';
+import './state';
 import './styles/styles.css';
 
 /**

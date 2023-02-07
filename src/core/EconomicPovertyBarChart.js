@@ -1,11 +1,11 @@
+import deepMerge from 'deepmerge';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import deepMerge from 'deepmerge';
 import defaultOptions, { colorways, handleResize, legendSelection } from '../charts/echarts/index';
+import ChartFilters from '../components/ChartFilters';
+import Select from '../components/Select';
 import fetchCSVData, { ACTIVE_BRANCH } from '../utils/data';
 import { addFilterWrapper } from '../widgets/filters';
-import Select from '../components/Select';
-import ChartFilters from '../components/ChartFilters';
 
 const dataFile = `https://raw.githubusercontent.com/devinit/economic-poverty-factsheet-viz/${ACTIVE_BRANCH}/src/data/barChartData.csv`;
 const defaultPovertyLine = '2.15';

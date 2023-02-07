@@ -1,21 +1,21 @@
-import React from 'react';
 import chroma from 'chroma-js';
+import React from 'react';
 import { createRoot } from 'react-dom/client';
 import fetchCSVData, { ACTIVE_BRANCH } from '../utils/data';
-import { addFilterWrapper } from '../widgets/filters';
-import Selectors from './components/Selectors';
 import {
   dataInjectedGeoJson,
-  highlightFeature,
-  getRegions,
-  getFilteredData,
-  getFillColor,
   getColor,
-  variableData,
+  getFillColor,
+  getFilteredData,
   getMaxMinValues,
+  getRegions,
+  highlightFeature,
   regionMapping,
+  variableData,
 } from '../utils/mapUtils';
+import { addFilterWrapper } from '../widgets/filters';
 import MapResetButton from './components/MapResetButton';
+import Selectors from './components/Selectors';
 
 const MAP_FILE_PATH = `https://raw.githubusercontent.com/devinit/economic-poverty-factsheet-viz/${ACTIVE_BRANCH}/src/data/world_map.geo.json`;
 const CSV_PATH = `https://raw.githubusercontent.com/devinit/economic-poverty-factsheet-viz/${ACTIVE_BRANCH}/src/data/map_data.csv`;
