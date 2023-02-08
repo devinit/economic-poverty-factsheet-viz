@@ -1,5 +1,5 @@
 import renderEconomicPovertyBarchart from './core/EconomicPovertyBarChart';
-import renderEconomicPovertyMap from './core/EconomicPovertyMap';
+import renderEconomicPovertyMap from './core/economicPovertyMap';
 import './state';
 import './styles/styles.css';
 

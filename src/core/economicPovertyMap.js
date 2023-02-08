@@ -30,7 +30,7 @@ const renderMap = (mapInstance, geoJsonData, groupInstance, csvData, dimensionVa
   const scaleData = getMaxMinValues(csvData, dimensionVariable);
 
   const legendInstanceCopy = legendInstance;
-  legendInstanceCopy.onAdd = function () {
+  legendInstanceCopy.onAdd = () => {
     const div = window.L.DomUtil.create('div', 'legend');
     const contentType = [{ name: 'solid' }, { name: 'pattern' }];
     const legendContent = `${contentType
@@ -204,7 +204,7 @@ function renderEconomicPovertyMap() {
                   map.setView([6.6, 20.9], 1);
                 };
 
-                resetButton.onAdd = function () {
+                resetButton.onAdd = () => {
                   const div = window.L.DomUtil.create('div');
                   const buttonRoot = createRoot(div);
                   buttonRoot.render(<MapResetButton onReset={onReset} />);
@@ -252,6 +252,7 @@ function renderEconomicPovertyMap() {
                 dichart.hideLoading();
               });
             })
+            // eslint-disable-next-line no-console
             .catch((error) => console.log(error));
         });
       },
