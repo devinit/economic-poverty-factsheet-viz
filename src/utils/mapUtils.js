@@ -30,6 +30,7 @@ const highlightFeature = (e, variable, filterOptions) => {
     fillColor: '#f7a838',
     color: '#484848',
     weight: 2,
+    fillPattern: null,
   });
 
   if (!window.L.Browser.ie && !window.L.Browser.opera && !window.L.Browser.edge) {
