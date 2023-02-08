@@ -1,4 +1,5 @@
-const colors = ['#0c457b', '#0071b1', '#0089cc', '#5da3d9', '#77adde', '#88bae5', '#bcd4f0', '#d3e0f4'];
+// const colors = ['#0c457b', '#0071b1', '#0089cc', '#5da3d9', '#77adde', '#88bae5', '#bcd4f0', '#d3e0f4'];
+const colors = ['#0c457b', '#0089cc', '#77adde', '#bcd4f0'];
 
 const regionMapping = [
   { name: 'ECA', label: 'Europe & Central Asia' },
@@ -17,7 +18,7 @@ const variableData = [
   },
   {
     variable: 'progressHC',
-    label: 'Percentage of people leaving poverty',
+    label: 'Percentage of people living in poverty',
     unit: '%',
   },
 ];
@@ -29,6 +30,7 @@ const highlightFeature = (e, variable, filterOptions) => {
     fillColor: '#f7a838',
     color: '#484848',
     weight: 2,
+    fillPattern: null,
   });
 
   if (!window.L.Browser.ie && !window.L.Browser.opera && !window.L.Browser.edge) {
@@ -41,8 +43,8 @@ const highlightFeature = (e, variable, filterOptions) => {
         filterOptions.find((option) => option.variable === variable).label
       }: ${
         variable === 'progresspoorpop'
-          ? (Number(layer.feature.properties[variable]) / 1000000).toFixed(4)
-          : (Number(layer.feature.properties[variable]) * 100).toFixed(3)
+          ? (Number(layer.feature.properties[variable]) / 1000000).toFixed(2)
+          : (Number(layer.feature.properties[variable]) * 100).toFixed(2)
       }<span style="padding-left: 2px;">${
         filterOptions.find((option) => option.variable === variable).unit
       }</span></div>`,
@@ -92,46 +94,73 @@ const getColor = (value, minValue, maxValue, increment, chromaInstance) => {
 };
 
 const getFillColor = (feature, variable, colorFunction, colorGenInstance, scaleData) => {
-  const interval = (scaleData.maxValue - scaleData.minValue) / colors.length;
+  const positiveInterval = (scaleData.positive.maxValue - scaleData.positive.minValue) / colors.length;
+  const negativeInterval = (scaleData.negative.maxValue - scaleData.negative.minValue) / colors.length;
   if (!feature.properties[variable]) {
     return '#E6E1E5';
   }
   if (variable === 'progresspoorpop') {
+    if (Number(feature.properties[variable]) / 1000000 >= 0) {
+      return colorFunction(
+        Number(feature.properties[variable]) / 1000000,
+        scaleData.positive.minValue,
+        scaleData.positive.maxValue,
+        positiveInterval,
+        colorGenInstance
+      );
+    }
+
     return colorFunction(
       Number(feature.properties[variable]) / 1000000,
-      scaleData.minValue,
-      scaleData.maxValue,
-      interval,
+      scaleData.negative.minValue,
+      scaleData.negative.maxValue,
+      negativeInterval,
       colorGenInstance
     );
   }
 
-  return colorFunction(
-    Number(feature.properties[variable]) * 100,
-    scaleData.minValue,
-    scaleData.maxValue,
-    interval,
-    colorGenInstance
-  );
+  return Number(feature.properties[variable]) / 1000000 >= 0
+    ? colorFunction(
+        Number(feature.properties[variable]) * 100,
+        scaleData.positive.minValue,
+        scaleData.positive.maxValue,
+        positiveInterval,
+        colorGenInstance
+      )
+    : colorFunction(
+        Number(feature.properties[variable]) * 100,
+        scaleData.negative.minValue,
+        scaleData.negative.maxValue,
+        negativeInterval,
+        colorGenInstance
+      );
 };
 const getMaxMinValues = (data, dataType) => {
   const dataList = data.map((item) => Number(item[dataType]));
+  const positiveDataList = dataList.filter((item) => item >= 0);
+  const negativeDataList = dataList.filter((item) => item < 0);
   if (dataType === 'progresspoorpop') {
     return {
-      maxValue: Math.ceil(Math.max(...dataList) / 1000000),
-      minValue:
-        Math.sign(Math.ceil(Math.min(...dataList) / 1000000)) === -1
-          ? Math.ceil(Math.min(...dataList) / 1000000) - 1
-          : Math.ceil(Math.min(...dataList) / 1000000),
+      positive: {
+        maxValue: Math.ceil(Math.max(...positiveDataList) / 1000000),
+        minValue: Math.ceil(Math.min(...positiveDataList) / 1000000),
+      },
+      negative: {
+        maxValue: Math.ceil(Math.max(...negativeDataList) / 1000000),
+        minValue: Math.ceil(Math.min(...negativeDataList) / 1000000) - 1,
+      },
     };
   }
 
   return {
-    maxValue: Math.ceil(Math.max(...dataList) * 100),
-    minValue:
-      Math.sign(Math.ceil(Math.min(...dataList) * 100)) === -1
-        ? Math.ceil(Math.min(...dataList) * 100) - 1
-        : Math.ceil(Math.min(...dataList) * 100),
+    positive: {
+      maxValue: Math.ceil(Math.max(...positiveDataList) * 100),
+      minValue: Math.ceil(Math.min(...positiveDataList) * 100),
+    },
+    negative: {
+      maxValue: Math.ceil(Math.max(...negativeDataList) * 100),
+      minValue: Math.ceil(Math.min(...negativeDataList) * 100) - 1,
+    },
   };
 };
 export {
@@ -144,4 +173,5 @@ export {
   variableData,
   getMaxMinValues,
   regionMapping,
+  colors,
 };

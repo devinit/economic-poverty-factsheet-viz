@@ -1,11 +1,11 @@
+import deepMerge from 'deepmerge';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import deepMerge from 'deepmerge';
 import defaultOptions, { colorways, handleResize, legendSelection } from '../charts/echarts/index';
+import ChartFilters from '../components/ChartFilters';
+import Select from '../components/Select';
 import fetchCSVData, { ACTIVE_BRANCH } from '../utils/data';
 import { addFilterWrapper } from '../widgets/filters';
-import Select from '../components/Select';
-import ChartFilters from '../components/ChartFilters';
 
 const dataFile = `https://raw.githubusercontent.com/devinit/economic-poverty-factsheet-viz/${ACTIVE_BRANCH}/src/data/barChartData.csv`;
 const defaultPovertyLine = '2.15';
@@ -20,23 +20,28 @@ const getSeries = (dataArray, years, filterValue) => {
     name: seriesName,
     type: 'bar',
     stack: 'Region',
-    emphasis: {
-      focus: 'series',
+    tooltip: {
+      trigger: 'item',
+      formatter: (params) => `${params.seriesName} <br> <strong>${params.name}: ${params.value}</strong> billion`,
     },
     data: years.map((year) => {
       const yearList = [];
-
       dataArray
         .filter((item) => item['poverty line (2017 PPP)'] === filterValue)
         .forEach((item) => {
           if (item['Region name'] === seriesName && item.year === year) {
-            yearList.push(Number(Number(item['Population in poverty (billions)']).toFixed(4)));
+            yearList.push(Number(Number(item['Population in poverty (billions)']).toFixed(2)));
           }
         });
 
       const accumulatedYearValue = yearList.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
-      return accumulatedYearValue.toFixed(4);
+      return {
+        value: accumulatedYearValue.toFixed(2),
+        emphasis: {
+          focus: 'self',
+        },
+      };
     }),
   }));
 

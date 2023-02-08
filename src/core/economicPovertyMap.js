@@ -1,21 +1,23 @@
-import React from 'react';
 import chroma from 'chroma-js';
+import React from 'react';
+import 'leaflet.pattern';
 import { createRoot } from 'react-dom/client';
 import fetchCSVData, { ACTIVE_BRANCH } from '../utils/data';
-import { addFilterWrapper } from '../widgets/filters';
-import Selectors from './components/Selectors';
 import {
   dataInjectedGeoJson,
-  highlightFeature,
-  getRegions,
-  getFilteredData,
-  getFillColor,
   getColor,
-  variableData,
+  getFillColor,
+  getFilteredData,
   getMaxMinValues,
+  getRegions,
+  highlightFeature,
   regionMapping,
+  variableData,
+  colors,
 } from '../utils/mapUtils';
+import { addFilterWrapper } from '../widgets/filters';
 import MapResetButton from './components/MapResetButton';
+import Selectors from './components/Selectors';
 
 const MAP_FILE_PATH = `https://raw.githubusercontent.com/devinit/economic-poverty-factsheet-viz/${ACTIVE_BRANCH}/src/data/world_map.geo.json`;
 const CSV_PATH = `https://raw.githubusercontent.com/devinit/economic-poverty-factsheet-viz/${ACTIVE_BRANCH}/src/data/map_data.csv`;
@@ -28,19 +30,39 @@ const renderMap = (mapInstance, geoJsonData, groupInstance, csvData, dimensionVa
   const scaleData = getMaxMinValues(csvData, dimensionVariable);
 
   const legendInstanceCopy = legendInstance;
-  legendInstanceCopy.onAdd = function () {
+  legendInstanceCopy.onAdd = () => {
     const div = window.L.DomUtil.create('div', 'legend');
-    const legendColors = ['#0c457b', '#0071b1', '#0089cc', '#5da3d9', '#77adde', '#88bae5', '#bcd4f0', '#d3e0f4'];
-    const legendContent = `${legendColors
-      .map(
-        (color) =>
-          `<span>
-          <i style="background:${color};border-radius:1px;margin-right:0;width:40px;"></i>
+    const contentType = [{ name: 'solid' }, { name: 'pattern' }];
+    const legendContent = `${contentType
+      .map((type) => {
+        const innerContent = colors
+          .map(
+            (color) =>
+              `<span>
+          <i style="background:${
+            type.name === 'solid'
+              ? color
+              : `repeating-linear-gradient(
+            45deg,
+            white 0px,
+            white 2px,
+            ${color} 2px,
+            ${color} 4px
+          )`
+          };border-radius:1px;margin-right:0;width:40px;"></i>
         </span>`
-      )
-      .join('')} <p style="margin-left:1px;margin-top: 4px;">${scaleData.minValue} - ${scaleData.maxValue}${
-      dimensionVariable === 'progressHC' ? ', % of population' : ', millions of people'
-    }</p>`;
+          )
+          .join('');
+
+        return `<div class="legendContentContainer"><p>${
+          type.name === 'solid' ? 'Increasing poverty' : 'Decreasing poverty'
+        }</p><div style="display: flex;flex-direction: row;">${innerContent}<p style="margin-left:1px;margin-top:4px;margin-right: 5px;">${
+          type.name === 'solid' ? scaleData.positive.minValue : scaleData.negative.minValue
+        } - ${type.name === 'solid' ? scaleData.positive.maxValue : scaleData.negative.maxValue}${
+          dimensionVariable === 'progressHC' ? ', % of population' : ', millions of people'
+        }</p></div></div>`;
+      })
+      .join('')}`;
     div.innerHTML = legendContent;
 
     return div;
@@ -48,7 +70,15 @@ const renderMap = (mapInstance, geoJsonData, groupInstance, csvData, dimensionVa
   legendInstanceCopy.addTo(mapInstance);
 
   const style = (feature) => ({
-    fillColor: getFillColor(feature, dimensionVariable, getColor, chroma, scaleData),
+    [Number(feature.properties[dimensionVariable]) < 0 ? 'fillPattern' : 'fillColor']:
+      Number(feature.properties[dimensionVariable]) < 0
+        ? new window.L.StripePattern({
+            weight: 2,
+            spaceWeight: 1,
+            angle: 45,
+            color: getFillColor(feature, dimensionVariable, getColor, chroma, scaleData),
+          }).addTo(mapInstance)
+        : getFillColor(feature, dimensionVariable, getColor, chroma, scaleData),
     weight: 1,
     opacity: 1,
     color: 'white',
@@ -114,7 +144,7 @@ function renderEconomicPovertyMap() {
           });
 
           // Legend
-          const legend = window.L.control({ position: 'topright' });
+          const legend = window.L.control({ position: 'bottomright' });
 
           // Reset button
           const resetButton = window.L.control({ position: 'bottomleft' });
@@ -132,7 +162,7 @@ function renderEconomicPovertyMap() {
                     label: 'Select poverty data type',
                     options: [
                       { value: 'progresspoorpop', label: 'Change in number of people in poverty' },
-                      { value: 'progressHC', label: 'Percentage of people leaving poverty' },
+                      { value: 'progressHC', label: 'Percentage of people living in poverty' },
                     ],
                     classPrefix: 'poverty-data-select',
                     stateProperty: 'povertyData',
@@ -174,7 +204,7 @@ function renderEconomicPovertyMap() {
                   map.setView([6.6, 20.9], 1);
                 };
 
-                resetButton.onAdd = function () {
+                resetButton.onAdd = () => {
                   const div = window.L.DomUtil.create('div');
                   const buttonRoot = createRoot(div);
                   buttonRoot.render(<MapResetButton onReset={onReset} />);
@@ -222,6 +252,7 @@ function renderEconomicPovertyMap() {
                 dichart.hideLoading();
               });
             })
+            // eslint-disable-next-line no-console
             .catch((error) => console.log(error));
         });
       },
