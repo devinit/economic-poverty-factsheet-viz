@@ -194,4 +194,5 @@ export {
   variableData,
   getMaxMinValues,
   regionMapping,
+  colors,
 };

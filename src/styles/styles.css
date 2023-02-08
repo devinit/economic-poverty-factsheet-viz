@@ -155,6 +155,9 @@
   font-size: 13px;
   padding: 2px;
 }
+.legendContentContainer{
+  flex-direction: column;
+}
 
 .leaflet-tooltip {
   position: absolute;

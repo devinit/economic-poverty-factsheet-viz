@@ -13,6 +13,7 @@ import {
   highlightFeature,
   regionMapping,
   variableData,
+  colors,
 } from '../utils/mapUtils';
 import { addFilterWrapper } from '../widgets/filters';
 import MapResetButton from './components/MapResetButton';
@@ -31,17 +32,37 @@ const renderMap = (mapInstance, geoJsonData, groupInstance, csvData, dimensionVa
   const legendInstanceCopy = legendInstance;
   legendInstanceCopy.onAdd = function () {
     const div = window.L.DomUtil.create('div', 'legend');
-    const legendColors = ['#0c457b', '#0071b1', '#0089cc', '#5da3d9', '#77adde', '#88bae5', '#bcd4f0', '#d3e0f4'];
-    const legendContent = `${legendColors
-      .map(
-        (color) =>
-          `<span>
-          <i style="background:${color};border-radius:1px;margin-right:0;width:40px;"></i>
+    const contentType = [{ name: 'solid' }, { name: 'pattern' }];
+    const legendContent = `${contentType
+      .map((type) => {
+        const innerContent = colors
+          .map(
+            (color) =>
+              `<span>
+          <i style="background:${
+            type.name === 'solid'
+              ? color
+              : `repeating-linear-gradient(
+            45deg,
+            white 0px,
+            white 2px,
+            ${color} 2px,
+            ${color} 4px
+          )`
+          };border-radius:1px;margin-right:0;width:40px;"></i>
         </span>`
-      )
-      .join('')} <p style="margin-left:1px;margin-top: 4px;">${scaleData.minValue} - ${scaleData.maxValue}${
-      dimensionVariable === 'progressHC' ? ', % of population' : ', millions of people'
-    }</p>`;
+          )
+          .join('');
+
+        return `<div class="legendContentContainer"><p>${
+          type.name === 'solid' ? 'Increasing poverty' : 'Decreasing poverty'
+        }</p><div style="display: flex;flex-direction: row;">${innerContent}<p style="margin-left:1px;margin-top:4px;margin-right: 5px;">${
+          type.name === 'solid' ? scaleData.positive.minValue : scaleData.negative.minValue
+        } - ${type.name === 'solid' ? scaleData.positive.maxValue : scaleData.negative.maxValue}${
+          dimensionVariable === 'progressHC' ? ', % of population' : ', millions of people'
+        }</p></div></div>`;
+      })
+      .join('')}`;
     div.innerHTML = legendContent;
 
     return div;
@@ -123,13 +144,10 @@ function renderEconomicPovertyMap() {
           });
 
           // Legend
-          const legend = window.L.control({ position: 'topright' });
+          const legend = window.L.control({ position: 'bottomright' });
 
           // Reset button
           const resetButton = window.L.control({ position: 'bottomleft' });
-
-          // stripes
-          // const stripes = new window.L.StripePattern();
 
           window
             .fetch(MAP_FILE_PATH)
