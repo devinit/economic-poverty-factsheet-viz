@@ -94,7 +94,6 @@ const getColor = (value, minValue, maxValue, increment, chromaInstance) => {
 };
 
 const getFillColor = (feature, variable, colorFunction, colorGenInstance, scaleData) => {
-  // const interval = (scaleData.maxValue - scaleData.minValue) / colors.length;
   const positiveInterval = (scaleData.positive.maxValue - scaleData.positive.minValue) / colors.length;
   const negativeInterval = (scaleData.negative.maxValue - scaleData.negative.minValue) / colors.length;
   if (!feature.properties[variable]) {
@@ -141,7 +140,7 @@ const getMaxMinValues = (data, dataType) => {
   const positiveDataList = dataList.filter((item) => item >= 0);
   const negativeDataList = dataList.filter((item) => item < 0);
   if (dataType === 'progresspoorpop') {
-    const mine = {
+    return {
       positive: {
         maxValue: Math.ceil(Math.max(...positiveDataList) / 1000000),
         minValue: Math.ceil(Math.min(...positiveDataList) / 1000000),
@@ -151,19 +150,9 @@ const getMaxMinValues = (data, dataType) => {
         minValue: Math.ceil(Math.min(...negativeDataList) / 1000000) - 1,
       },
     };
-    console.log(mine);
-
-    // return {
-    //   maxValue: Math.ceil(Math.max(...dataList) / 1000000),
-    //   minValue:
-    //     Math.sign(Math.ceil(Math.min(...dataList) / 1000000)) === -1
-    //       ? Math.ceil(Math.min(...dataList) / 1000000) - 1
-    //       : Math.ceil(Math.min(...dataList) / 1000000),
-    // };
-    return mine;
   }
 
-  const percentage = {
+  return {
     positive: {
       maxValue: Math.ceil(Math.max(...positiveDataList) * 100),
       minValue: Math.ceil(Math.min(...positiveDataList) * 100),
@@ -173,16 +162,6 @@ const getMaxMinValues = (data, dataType) => {
       minValue: Math.ceil(Math.min(...negativeDataList) * 100) - 1,
     },
   };
-  console.log(percentage);
-
-  return percentage;
-  // return {
-  //   maxValue: Math.ceil(Math.max(...dataList) * 100),
-  //   minValue:
-  //     Math.sign(Math.ceil(Math.min(...dataList) * 100)) === -1
-  //       ? Math.ceil(Math.min(...dataList) * 100) - 1
-  //       : Math.ceil(Math.min(...dataList) * 100),
-  // };
 };
 export {
   highlightFeature,
