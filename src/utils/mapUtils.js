@@ -5,7 +5,7 @@ const regionMapping = [
   { name: 'ECA', label: 'Europe & Central Asia' },
   { name: 'MNA', label: 'Middle East & North Africa' },
   { name: 'SSA', label: 'Sub-Saharan Africa' },
-  { name: 'OHI', label: 'Other High Income Countries' },
+  { name: 'OHI', label: 'Other high-income countries' },
   { name: 'SAS', label: 'South Asia' },
   { name: 'LAC', label: 'Latin America & Caribbean' },
   { name: 'EAP', label: 'East Asia & Pacific' },
@@ -13,12 +13,12 @@ const regionMapping = [
 const variableData = [
   {
     variable: 'changepoorpop',
-    label: 'Change in number of people in poverty',
+    label: 'Change in number of people living in poverty',
     unit: 'million',
   },
   {
     variable: 'changeHC',
-    label: 'Percentage of people living in poverty',
+    label: 'Change in the percentage of people living in poverty',
     unit: '%',
   },
 ];
