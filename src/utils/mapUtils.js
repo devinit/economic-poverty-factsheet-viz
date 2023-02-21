@@ -12,12 +12,12 @@ const regionMapping = [
 ];
 const variableData = [
   {
-    variable: 'progresspoorpop',
+    variable: 'changepoorpop',
     label: 'Change in number of people in poverty',
     unit: 'million',
   },
   {
-    variable: 'progressHC',
+    variable: 'changeHC',
     label: 'Percentage of people living in poverty',
     unit: '%',
   },
@@ -42,7 +42,7 @@ const highlightFeature = (e, variable, filterOptions) => {
       `<div>${layer.feature.properties.country_name}<br>${
         filterOptions.find((option) => option.variable === variable).label
       }: ${
-        variable === 'progresspoorpop'
+        variable === 'changepoorpop'
           ? (Number(layer.feature.properties[variable]) / 1000000).toFixed(2)
           : (Number(layer.feature.properties[variable]) * 100).toFixed(2)
       }<span style="padding-left: 2px;">${
@@ -99,7 +99,7 @@ const getFillColor = (feature, variable, colorFunction, colorGenInstance, scaleD
   if (!feature.properties[variable]) {
     return '#E6E1E5';
   }
-  if (variable === 'progresspoorpop') {
+  if (variable === 'changepoorpop') {
     if (Number(feature.properties[variable]) / 1000000 >= 0) {
       return colorFunction(
         Number(feature.properties[variable]) / 1000000,
@@ -139,7 +139,7 @@ const getMaxMinValues = (data, dataType) => {
   const dataList = data.map((item) => Number(item[dataType]));
   const positiveDataList = dataList.filter((item) => item >= 0);
   const negativeDataList = dataList.filter((item) => item < 0);
-  if (dataType === 'progresspoorpop') {
+  if (dataType === 'changepoorpop') {
     return {
       positive: {
         maxValue: Math.ceil(Math.max(...positiveDataList) / 1000000),

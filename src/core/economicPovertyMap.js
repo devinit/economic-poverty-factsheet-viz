@@ -21,7 +21,7 @@ import Selectors from './components/Selectors';
 
 const MAP_FILE_PATH = `https://raw.githubusercontent.com/devinit/economic-poverty-factsheet-viz/${ACTIVE_BRANCH}/src/data/world_map.geo.json`;
 const CSV_PATH = `https://raw.githubusercontent.com/devinit/economic-poverty-factsheet-viz/${ACTIVE_BRANCH}/src/data/map_data.csv`;
-const defaultPovertyData = 'progresspoorpop';
+const defaultPovertyData = 'changepoorpop';
 const defaultRegion = 'all';
 const defaultPovertyLine = '2.15';
 
@@ -59,7 +59,7 @@ const renderMap = (mapInstance, geoJsonData, groupInstance, csvData, dimensionVa
         }</p><div style="display: flex;flex-direction: row;">${innerContent}<p style="margin-left:1px;margin-top:4px;margin-right: 5px;">${
           type.name === 'solid' ? scaleData.positive.minValue : scaleData.negative.minValue
         } - ${type.name === 'solid' ? scaleData.positive.maxValue : scaleData.negative.maxValue}${
-          dimensionVariable === 'progressHC' ? ', % of population' : ', millions of people'
+          dimensionVariable === 'changeHC' ? ', % of population' : ', millions of people'
         }</p></div></div>`;
       })
       .join('')}`;
@@ -161,12 +161,12 @@ function renderEconomicPovertyMap() {
                   {
                     label: 'Select poverty data type',
                     options: [
-                      { value: 'progresspoorpop', label: 'Change in number of people in poverty' },
-                      { value: 'progressHC', label: 'Percentage of people living in poverty' },
+                      { value: 'changepoorpop', label: 'Change in number of people in poverty' },
+                      { value: 'changeHC', label: 'Percentage of people living in poverty' },
                     ],
                     classPrefix: 'poverty-data-select',
                     stateProperty: 'povertyData',
-                    defaultValue: { value: 'progresspoorpop', label: 'Change in number of people in poverty' },
+                    defaultValue: { value: 'changepoorpop', label: 'Change in number of people in poverty' },
                   },
                   {
                     label: 'Select region',
