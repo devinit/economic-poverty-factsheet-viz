@@ -106,7 +106,7 @@ const renderEconomicPovertyBarchart = () => {
                     type: 'value',
                     name: 'Number of people living in poverty (billions)',
                     nameLocation: 'middle',
-                    nameGap: 35,
+                    nameGap: 42,
                   },
                   series: getSeries(data, years, povertyLine),
                 };
