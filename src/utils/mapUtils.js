@@ -23,6 +23,23 @@ const variableData = [
   },
 ];
 
+const getTooltipText = (variable, layerInstance) => {
+  let text;
+  if (variable === 'changepoorpop') {
+    text =
+      layerInstance.feature.properties[variable] < 0
+        ? 'Reduction in people living in poverty'
+        : 'Additional people living in poverty';
+  } else {
+    text =
+      layerInstance.feature.properties[variable] < 0
+        ? 'Reduction in proportion of population living in poverty'
+        : 'Additional proportion of population living in poverty';
+  }
+
+  return text;
+};
+
 const highlightFeature = (e, variable, filterOptions) => {
   const layer = e.target;
 
@@ -39,9 +56,7 @@ const highlightFeature = (e, variable, filterOptions) => {
   // Bind popup to layer
   layer
     .bindTooltip(
-      `<div>${layer.feature.properties.country_name}<br>${
-        filterOptions.find((option) => option.variable === variable).label
-      }: ${
+      `<div>${layer.feature.properties.country_name}<br>${getTooltipText(variable, layer)}: ${
         variable === 'changepoorpop'
           ? (Number(layer.feature.properties[variable]) / 1000000).toFixed(2)
           : (Number(layer.feature.properties[variable]) * 100).toFixed(2)
