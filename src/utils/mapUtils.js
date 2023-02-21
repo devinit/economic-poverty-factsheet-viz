@@ -1,5 +1,4 @@
-// const colors = ['#0c457b', '#0071b1', '#0089cc', '#5da3d9', '#77adde', '#88bae5', '#bcd4f0', '#d3e0f4'];
-const colors = ['#0c457b', '#0089cc', '#77adde', '#bcd4f0'];
+const colors = ['#bcd4f0', '#77adde', '#0089cc', '#0c457b'];
 
 const regionMapping = [
   { name: 'ECA', label: 'Europe & Central Asia' },
@@ -97,13 +96,13 @@ const getFilteredData = (data, line, region) => {
   return data.filter((item) => item.poverty_line === line && item.PIP_Region === region);
 };
 
-const getColor = (value, minValue, maxValue, increment, chromaInstance) => {
+const getColor = (value, minValue, maxValue, increment, chromaInstance, colorArray) => {
   // Generate a range of values between the minimum and maximum value
   const values = [];
   for (let i = minValue; i <= maxValue; i += increment) {
     values.push(i);
   }
-  const colorGen = chromaInstance.scale(colors).domain(values);
+  const colorGen = chromaInstance.scale(colorArray).domain(values);
 
   return colorGen(value);
 };
@@ -121,7 +120,8 @@ const getFillColor = (feature, variable, colorFunction, colorGenInstance, scaleD
         scaleData.positive.minValue,
         scaleData.positive.maxValue,
         positiveInterval,
-        colorGenInstance
+        colorGenInstance,
+        colors
       );
     }
 
@@ -130,7 +130,8 @@ const getFillColor = (feature, variable, colorFunction, colorGenInstance, scaleD
       scaleData.negative.minValue,
       scaleData.negative.maxValue,
       negativeInterval,
-      colorGenInstance
+      colorGenInstance,
+      colors
     );
   }
 
@@ -140,14 +141,16 @@ const getFillColor = (feature, variable, colorFunction, colorGenInstance, scaleD
         scaleData.positive.minValue,
         scaleData.positive.maxValue,
         positiveInterval,
-        colorGenInstance
+        colorGenInstance,
+        colors
       )
     : colorFunction(
         Number(feature.properties[variable]) * 100,
         scaleData.negative.minValue,
         scaleData.negative.maxValue,
         negativeInterval,
-        colorGenInstance
+        colorGenInstance,
+        colors
       );
 };
 const getMaxMinValues = (data, dataType) => {

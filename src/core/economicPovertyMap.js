@@ -13,7 +13,6 @@ import {
   highlightFeature,
   regionMapping,
   variableData,
-  colors,
 } from '../utils/mapUtils';
 import { addFilterWrapper } from '../widgets/filters';
 import MapResetButton from './components/MapResetButton';
@@ -24,6 +23,8 @@ const CSV_PATH = `https://raw.githubusercontent.com/devinit/economic-poverty-fac
 const defaultPovertyData = 'changepoorpop';
 const defaultRegion = 'all';
 const defaultPovertyLine = '2.15';
+const positiveLegendColors = ['#0c457b', '#0089cc', '#77adde', '#bcd4f0'];
+const negativeLegendColors = ['#bcd4f0', '#77adde', '#0089cc', '#0c457b'];
 
 const renderMap = (mapInstance, geoJsonData, groupInstance, csvData, dimensionVariable, legendInstance) => {
   let geojsonLayer;
@@ -32,37 +33,29 @@ const renderMap = (mapInstance, geoJsonData, groupInstance, csvData, dimensionVa
   const legendInstanceCopy = legendInstance;
   legendInstanceCopy.onAdd = () => {
     const div = window.L.DomUtil.create('div', 'legend');
-    const contentType = [{ name: 'solid' }, { name: 'pattern' }];
-    const legendContent = `${contentType
-      .map((type) => {
-        const innerContent = colors
-          .map(
-            (color) =>
-              `<span>
-          <i style="background:${
-            type.name === 'solid'
-              ? color
-              : `repeating-linear-gradient(
-            45deg,
-            white 0px,
-            white 2px,
-            ${color} 2px,
-            ${color} 4px
-          )`
-          };border-radius:1px;margin-right:0;width:40px;"></i>
-        </span>`
-          )
-          .join('');
 
-        return `<div class="legendContentContainer"><p>${
-          type.name === 'solid' ? 'Increasing poverty' : 'Decreasing poverty'
-        }</p><div style="display: flex;flex-direction: row;">${innerContent}<p style="margin-left:1px;margin-top:4px;margin-right: 5px;">${
-          type.name === 'solid' ? scaleData.positive.minValue : scaleData.negative.minValue
-        } - ${type.name === 'solid' ? scaleData.positive.maxValue : scaleData.negative.maxValue}${
-          dimensionVariable === 'changeHC' ? ', % of population' : ', millions of people'
-        }</p></div></div>`;
-      })
-      .join('')}`;
+    const legendContent = `<div class="legendContentContainer"><p style="justify-content: center;">Change in poverty levels (see map for exact change)</p> <div style="display: flex;flex-direction: row;"><p style="margin-right:8px;">Greatest increase</p>${positiveLegendColors
+      .map(
+        (color) =>
+          `<span>
+          <i style="background:${color};border-radius:1px;margin-right:8px;width:40px;"></i>
+          </span>`
+      )
+      .join('')}<p style="margin-right:8px;">No change</p>${negativeLegendColors
+      .map(
+        (color) =>
+          `<span>
+            <i style="background:${`repeating-linear-gradient(
+              45deg,
+              white 0px,
+              white 2px,
+              ${color} 2px,
+              ${color} 4px
+            )`};border-radius:1px;margin-right:8px;width:40px;"></i>
+            </span>`
+      )
+      .join('')}
+          <p>Greatest decrease</p></div></div>`;
     div.innerHTML = legendContent;
 
     return div;

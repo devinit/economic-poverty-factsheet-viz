@@ -156,6 +156,8 @@
   padding: 2px;
 }
 .legendContentContainer{
+  display: flex;
+  align-items: center;
   flex-direction: column;
 }
 
