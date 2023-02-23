@@ -4,7 +4,7 @@ const regionMapping = [
   { name: 'ECA', label: 'Europe & Central Asia' },
   { name: 'MNA', label: 'Middle East & North Africa' },
   { name: 'SSA', label: 'Sub-Saharan Africa' },
-  { name: 'OHI', label: 'Other high-income countries' },
+  { name: 'OHI', label: 'Other High-Income Countries' },
   { name: 'SAS', label: 'South Asia' },
   { name: 'LAC', label: 'Latin America & Caribbean' },
   { name: 'EAP', label: 'East Asia & Pacific' },
@@ -57,8 +57,8 @@ const highlightFeature = (e, variable, filterOptions) => {
     .bindTooltip(
       `<div>${layer.feature.properties.country_name}<br>${getTooltipText(variable, layer)}: ${
         variable === 'changepoorpop'
-          ? Math.abs(Number(layer.feature.properties[variable]) / 1000000).toFixed(2)
-          : Math.abs(Number(layer.feature.properties[variable]) * 100).toFixed(2)
+          ? Math.abs((Number(layer.feature.properties[variable]) / 1000000).toFixed(2))
+          : Math.abs((Number(layer.feature.properties[variable]) * 100).toFixed(2))
       }<span style="padding-left: 2px;">${
         filterOptions.find((option) => option.variable === variable).unit
       }</span></div>`,
@@ -98,10 +98,17 @@ const getFilteredData = (data, line, region) => {
 
 const getColor = (value, minValue, maxValue, increment, chromaInstance, colorArray) => {
   // Generate a range of values between the minimum and maximum value
-  const values = [];
-  for (let i = minValue; i <= maxValue; i += increment) {
-    values.push(i);
+  let values = [];
+
+  if (increment === 0) {
+    // Cater for cases where min and max value is 1
+    values = [0, 0.25, 0.5, 0.75, 1];
+  } else {
+    for (let i = minValue; i <= maxValue; i += increment) {
+      values.push(i);
+    }
   }
+
   const colorGen = chromaInstance.scale(colorArray).domain(values);
 
   return colorGen(Math.abs(value));
@@ -110,13 +117,14 @@ const getColor = (value, minValue, maxValue, increment, chromaInstance, colorArr
 const getFillColor = (feature, variable, colorFunction, colorGenInstance, scaleData) => {
   const positiveInterval = (scaleData.positive.maxValue - scaleData.positive.minValue) / colors.length;
   const negativeInterval = (scaleData.negative.maxValue - scaleData.negative.minValue) / colors.length;
+  const variableValue = Number(feature.properties[variable]) / 1000000;
   if (!feature.properties[variable]) {
     return '#E6E1E5';
   }
   if (variable === 'changepoorpop') {
-    if (Number(feature.properties[variable]) / 1000000 >= 0) {
+    if (variableValue >= 0) {
       return colorFunction(
-        Number(feature.properties[variable]) / 1000000,
+        variableValue,
         scaleData.positive.minValue,
         scaleData.positive.maxValue,
         positiveInterval,
@@ -126,7 +134,7 @@ const getFillColor = (feature, variable, colorFunction, colorGenInstance, scaleD
     }
 
     return colorFunction(
-      Number(feature.properties[variable]) / 1000000,
+      variableValue,
       scaleData.negative.minValue,
       scaleData.negative.maxValue,
       negativeInterval,
@@ -135,7 +143,7 @@ const getFillColor = (feature, variable, colorFunction, colorGenInstance, scaleD
     );
   }
 
-  return Number(feature.properties[variable]) / 1000000 >= 0
+  return variableValue >= 0
     ? colorFunction(
         Number(feature.properties[variable]) * 100,
         scaleData.positive.minValue,
@@ -177,7 +185,7 @@ const getMaxMinValues = (data, dataType) => {
     },
     negative: {
       maxValue: Math.ceil(Math.max(...negativeDataList) * 100),
-      minValue: Math.ceil(Math.min(...negativeDataList) * 100) - 1,
+      minValue: Math.ceil(Math.min(...negativeDataList) * 100),
     },
   };
 };

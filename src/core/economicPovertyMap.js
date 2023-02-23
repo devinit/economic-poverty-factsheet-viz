@@ -23,10 +23,10 @@ const CSV_PATH = `https://raw.githubusercontent.com/devinit/economic-poverty-fac
 const defaultPovertyData = 'changepoorpop';
 const defaultRegion = 'all';
 const defaultPovertyLine = '2.15';
-const positiveLegendColors = ['#0c457b', '#0089cc', '#77adde', '#bcd4f0'];
-const negativeLegendColors = ['#bcd4f0', '#77adde', '#0089cc', '#0c457b'];
 
 const renderMap = (mapInstance, geoJsonData, groupInstance, csvData, dimensionVariable, legendInstance) => {
+  const positiveLegendColors = ['#0c457b', '#0089cc', '#77adde', '#bcd4f0'];
+  const negativeLegendColors = ['#bcd4f0', '#77adde', '#0089cc', '#0c457b'];
   let geojsonLayer;
   const scaleData = getMaxMinValues(csvData, dimensionVariable);
 
@@ -134,6 +134,7 @@ function renderEconomicPovertyMap() {
             center: [6.6, 20.9],
             zoom: 1,
             attributionControl: false,
+            zIndex: 0,
           });
 
           // Legend
