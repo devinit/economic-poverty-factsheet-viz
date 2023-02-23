@@ -104,7 +104,7 @@ const getColor = (value, minValue, maxValue, increment, chromaInstance, colorArr
   }
   const colorGen = chromaInstance.scale(colorArray).domain(values);
 
-  return colorGen(value);
+  return colorGen(Math.abs(value));
 };
 
 const getFillColor = (feature, variable, colorFunction, colorGenInstance, scaleData) => {
@@ -156,7 +156,7 @@ const getFillColor = (feature, variable, colorFunction, colorGenInstance, scaleD
 const getMaxMinValues = (data, dataType) => {
   const dataList = data.map((item) => Number(item[dataType]));
   const positiveDataList = dataList.filter((item) => item >= 0);
-  const negativeDataList = dataList.filter((item) => item < 0);
+  const negativeDataList = dataList.filter((item) => item < 0).map((item) => Math.abs(item));
   if (dataType === 'changepoorpop') {
     return {
       positive: {
@@ -165,7 +165,7 @@ const getMaxMinValues = (data, dataType) => {
       },
       negative: {
         maxValue: Math.ceil(Math.max(...negativeDataList) / 1000000),
-        minValue: Math.ceil(Math.min(...negativeDataList) / 1000000) - 1,
+        minValue: Math.ceil(Math.min(...negativeDataList) / 1000000),
       },
     };
   }
