@@ -57,8 +57,8 @@ const highlightFeature = (e, variable, filterOptions) => {
     .bindTooltip(
       `<div>${layer.feature.properties.country_name}<br>${getTooltipText(variable, layer)}: ${
         variable === 'changepoorpop'
-          ? (Number(layer.feature.properties[variable]) / 1000000).toFixed(2)
-          : (Number(layer.feature.properties[variable]) * 100).toFixed(2)
+          ? Math.abs(Number(layer.feature.properties[variable]) / 1000000).toFixed(2)
+          : Math.abs(Number(layer.feature.properties[variable]) * 100).toFixed(2)
       }<span style="padding-left: 2px;">${
         filterOptions.find((option) => option.variable === variable).unit
       }</span></div>`,
