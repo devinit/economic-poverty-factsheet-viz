@@ -17,7 +17,7 @@ const getSeriesNames = (data) => Array.from(new Set(data.map((item) => item['Reg
 const getSeries = (dataArray, years, filterValue) => {
   const seriesNames = getSeriesNames(dataArray);
   const series = seriesNames.map((seriesName) => ({
-    name: seriesName,
+    name: seriesName === 'Other High Income Countries' ? 'Other High-Income Countries' : seriesName,
     type: 'bar',
     stack: 'Region',
     tooltip: {
@@ -106,7 +106,7 @@ const renderEconomicPovertyBarchart = () => {
                     type: 'value',
                     name: 'Number of people living in poverty (billions)',
                     nameLocation: 'middle',
-                    nameGap: 35,
+                    nameGap: 48,
                   },
                   series: getSeries(data, years, povertyLine),
                 };
