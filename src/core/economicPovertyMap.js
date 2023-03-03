@@ -74,7 +74,10 @@ const renderMap = (mapInstance, geoJsonData, groupInstance, csvData, dimensionVa
         : getFillColor(feature, dimensionVariable, getColor, chroma, scaleData),
     weight: 1,
     opacity: 1,
-    color: 'white',
+    color:
+      Number(feature.properties[dimensionVariable]) < 0
+        ? getFillColor(feature, dimensionVariable, getColor, chroma, scaleData)
+        : 'white',
     fillOpacity: 1,
   });
 
