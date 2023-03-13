@@ -29,16 +29,51 @@ export const colorways = {
 export const mixedColourWay = () => {
   const themes = Object.keys(colorways).filter((key) => key !== 'rainbow');
 
-  return colorways.rainbow.reduce((colours, hex, index) => [hex].concat(
-    themes.reduce((_themed, theme) => {
-      if (colorways[theme].length > index) {
-        return _themed.concat(colorways[theme][index]);
-      }
+  return colorways.rainbow.reduce((colours, hex, index) =>
+    [hex].concat(
+      themes.reduce((_themed, theme) => {
+        if (colorways[theme].length > index) {
+          return _themed.concat(colorways[theme][index]);
+        }
 
-      return _themed;
-    }, colours),
-    [],
-  ));
+        return _themed;
+      }, colours),
+      []
+    )
+  );
+};
+
+export const legendSelection = (chart, params) => {
+  const obj = params.selected;
+  const selectAll = Object.values(obj).filter((f) => f).length;
+  chart.setOption({ animation: true });
+
+  if (selectAll === 0) {
+    // select all on second click
+    Object.keys(obj).forEach((key) => {
+      chart.dispatchAction({
+        type: 'legendSelect',
+        name: key,
+      });
+    });
+  } else if (!obj[params.name]) {
+    // If user has unselected an item
+    // Re-select what the user unselected
+    chart.dispatchAction({
+      type: 'legendSelect',
+      name: params.name,
+    });
+
+    // Deselect everything else
+    Object.keys(obj).forEach((key) => {
+      if (Object.prototype.hasOwnProperty.call(obj, key) && key !== params.name) {
+        chart.dispatchAction({
+          type: 'legendUnSelect',
+          name: key,
+        });
+      }
+    });
+  }
 };
 
 // default echart options for DI charts
@@ -115,7 +150,7 @@ export const handleResize = (chart, chartNode) => {
     () => {
       chart.resize({ width: `${chartNode.clientWidth}px`, height: `${chartNode.clientHeight}px` });
     },
-    true,
+    true
   );
 };
 
@@ -123,7 +158,7 @@ export const getYAxisNamePositionFromSeries = (series) => {
   const isStack = series.some((item) => item.stack);
   const seriesCount = Array.from(new Set(series.map((d) => d.name))).length;
   const max = Math.max(
-    ...series.reduce((allData, { data }) => allData.concat(data.map((item) => item.value || 0)), []),
+    ...series.reduce((allData, { data }) => allData.concat(data.map((item) => item.value || 0)), [])
   );
   if (max === 0) {
     return 'blank';
