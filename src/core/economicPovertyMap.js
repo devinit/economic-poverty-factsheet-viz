@@ -41,7 +41,9 @@ const renderMap = (mapInstance, geoJsonData, groupInstance, csvData, dimensionVa
           <i style="background:${color};border-radius:1px;margin-right:8px;width:40px;"></i>
           </span>`
       )
-      .join('')}<p style="margin-right:8px;">No change</p>${negativeLegendColors
+      .join(
+        ''
+      )}<span><i style="margin-right:8px;border: 1px solid #0c457b;background: white; width: 40px;border-radius:1px"></i></span>${negativeLegendColors
       .map(
         (color) =>
           `<span>
