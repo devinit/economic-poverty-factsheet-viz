@@ -160,7 +160,7 @@ function renderEconomicPovertyMap() {
                   {
                     label: 'Select poverty data type',
                     options: [
-                      { value: 'changepoorpop', label: 'Change in number of people in poverty' },
+                      { value: 'changepoorpop', label: 'Change in number of people living in poverty' },
                       { value: 'changeHC', label: 'Change in proportion of people living in poverty' },
                     ],
                     classPrefix: 'poverty-data-select',
