@@ -165,7 +165,7 @@ function renderEconomicPovertyMap() {
                     ],
                     classPrefix: 'poverty-data-select',
                     stateProperty: 'povertyData',
-                    defaultValue: { value: 'changepoorpop', label: 'Change in number of people in poverty' },
+                    defaultValue: { value: 'changepoorpop', label: 'Change in number of people living in poverty' },
                   },
                   {
                     label: 'Select region',
