@@ -4,7 +4,7 @@ const regionMapping = [
   { name: 'ECA', label: 'Europe & Central Asia' },
   { name: 'MNA', label: 'Middle East & North Africa' },
   { name: 'SSA', label: 'Sub-Saharan Africa' },
-  { name: 'OHI', label: 'Other High-Income Countries' },
+  { name: 'OHI', label: 'Other high-income countries*' },
   { name: 'SAS', label: 'South Asia' },
   { name: 'LAC', label: 'Latin America & Caribbean' },
   { name: 'EAP', label: 'East Asia & Pacific' },
@@ -22,21 +22,27 @@ const variableData = [
   },
 ];
 
-const getTooltipText = (variable, layerInstance) => {
+const getTooltipDetails = (variable, layerInstance) => {
   let text;
+  let value;
   if (variable === 'changepoorpop') {
     text =
       layerInstance.feature.properties[variable] < 0
         ? 'Reduction in people living in poverty'
         : 'Additional people living in poverty';
+    value =
+      Math.abs((Number(layerInstance.feature.properties[variable]) / 1000000).toFixed(2)) === 0
+        ? 'less than 0.01'
+        : Math.abs((Number(layerInstance.feature.properties[variable]) / 1000000).toFixed(2));
   } else {
     text =
       layerInstance.feature.properties[variable] < 0
         ? 'Reduction in proportion of population living in poverty'
         : 'Additional proportion of population living in poverty';
+    value = Math.abs((Number(layerInstance.feature.properties[variable]) * 100).toFixed(2));
   }
 
-  return text;
+  return { text, value };
 };
 
 const highlightFeature = (e, variable, filterOptions) => {
@@ -55,10 +61,8 @@ const highlightFeature = (e, variable, filterOptions) => {
   // Bind popup to layer
   layer
     .bindTooltip(
-      `<div>${layer.feature.properties.country_name}<br>${getTooltipText(variable, layer)}: ${
-        variable === 'changepoorpop'
-          ? Math.abs((Number(layer.feature.properties[variable]) / 1000000).toFixed(2))
-          : Math.abs((Number(layer.feature.properties[variable]) * 100).toFixed(2))
+      `<div>${layer.feature.properties.country_name}<br>${getTooltipDetails(variable, layer).text}: ${
+        getTooltipDetails(variable, layer).value
       }<span style="padding-left: 2px;">${
         filterOptions.find((option) => option.variable === variable).unit
       }</span></div>`,

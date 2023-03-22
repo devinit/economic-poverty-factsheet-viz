@@ -17,7 +17,7 @@ const getSeriesNames = (data) => Array.from(new Set(data.map((item) => item['Reg
 const getSeries = (dataArray, years, filterValue) => {
   const seriesNames = getSeriesNames(dataArray);
   const series = seriesNames.map((seriesName) => ({
-    name: seriesName === 'Other High Income Countries' ? 'Other High-Income Countries' : seriesName,
+    name: seriesName === 'Other High Income Countries' ? 'Other high-income countries*' : seriesName,
     type: 'bar',
     stack: 'Region',
     tooltip: {
