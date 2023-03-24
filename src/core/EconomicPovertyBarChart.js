@@ -30,14 +30,14 @@ const getSeries = (dataArray, years, filterValue) => {
         .filter((item) => item['poverty line (2017 PPP)'] === filterValue)
         .forEach((item) => {
           if (item['Region name'] === seriesName && item.year === year) {
-            yearList.push(Number(Number(item['Population in poverty (billions)']).toFixed(2)));
+            yearList.push(Number(Number(item['Population in poverty (billions)'])));
           }
         });
 
       const accumulatedYearValue = yearList.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
       return {
-        value: accumulatedYearValue.toFixed(2),
+        value: accumulatedYearValue.toFixed(3),
         emphasis: {
           focus: 'self',
         },
